@@ -111,11 +111,27 @@ namespace S100Lint.Model
 
                         // check on the existence of the type in the featurecatalogue
 
-                        var overallcheckNodeListStrict =
+                        XmlNodeList overallcheckNodeListStrict =
                                 featureCatalogue.LastChild.SelectNodes($@"//S100FC:code[.='{complexTypeName}']", fcNsmgr);
 
-                        var overallcheckNodeListLoose =
+                        if ((overallcheckNodeListStrict == null || overallcheckNodeListStrict.Count == 0) && complexTypeName.EndsWith("Type"))
+                        { 
+                            // XML Schema's sometimes use 'Type' added to distinguish between typedefinition and concrete implementation. If there is no
+                            // hit if removing the 'Type' results in a hit. If so use this result instread
+                            overallcheckNodeListStrict =
+                                featureCatalogue.LastChild.SelectNodes($@"//S100FC:code[.='{complexTypeName.Replace("Type", "")}']", fcNsmgr);
+                        }
+
+                        XmlNodeList overallcheckNodeListLoose =
                                 featureCatalogue.LastChild.SelectNodes($@"//S100FC:code[translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='{complexTypeName.ToLower(CultureInfo.InvariantCulture)}']", fcNsmgr);
+
+                        if ((overallcheckNodeListLoose == null || overallcheckNodeListLoose.Count == 0) && complexTypeName.EndsWith("Type"))
+                        {
+                            // XML Schema's sometimes use 'Type' added to distinguish between typedefinition and concrete implementation. If there is no
+                            // hit if removing the 'Type' results in a hit. If so use this result instread
+                            overallcheckNodeListLoose =
+                                featureCatalogue.LastChild.SelectNodes($@"//S100FC:code[translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='{complexTypeName.Replace("Type", "").ToLower(CultureInfo.InvariantCulture)}']", fcNsmgr);
+                        }
 
                         var parentNodeTypeName =
                             extensionType.Replace("Abstract", "", StringComparison.InvariantCulture)
@@ -163,7 +179,7 @@ namespace S100Lint.Model
                                     {
                                         Level = Enumerations.Level.Error,
                                         Type = Enum.Parse<Enumerations.Type>(parentNodeTypeName, true),
-                                        Message = $"{complexTypeName} is spelled with a different set of upper- and lower case characters ('{complexTypeName}' where it should be '{overallcheckNodeListLoose[0].InnerText}')",
+                                        Message = $"{complexTypeName} is spelled with a different set of upper- and lower case characters ('{complexTypeName}') where it should be '{overallcheckNodeListLoose[0].InnerText}')",
                                         TimeStamp = DateTime.Now
                                     };
                         }
@@ -175,7 +191,7 @@ namespace S100Lint.Model
                                 reportItem =
                                         new ReportItem
                                         {
-                                            Level = Enumerations.Level.Error,
+                                            Level = Enumerations.Level.Warning,
                                             Type = Enum.Parse<Enumerations.Type>(parentNodeTypeName, true),
                                             Message = $"{complexTypeName} is found in the feature catalogue as an '{overallcheckNodeListStrict[0].ParentNode.Name.LastPart("_")}' but the schema has assigned it to a different basetype ({extensionType})",
                                             TimeStamp = DateTime.Now

@@ -1,6 +1,5 @@
-﻿using System;
-using S100Lint.Model;
-using S100Lint.Base;
+﻿using S100Lint.Model;
+using System;
 
 namespace S100Lint
 {
@@ -9,7 +8,10 @@ namespace S100Lint
         static void Main(string[] args)
         {
 #if DEBUG
-            args = new[] { "S123.XSD", "S123_FC.XML"};
+            if (args.Length == 0)
+            {
+                args = new[] { "S122.XSD", "S122_FC.XML" };
+            }
 #endif 
 
             if (args.Length != 2)
@@ -36,7 +38,7 @@ namespace S100Lint
                     }
                     else
                     {
-                        Console.WriteLine($"{reportItem.TimeStamp.ToString("yyyy-MM-dd HH:mm:ss.ffff")}: {reportItem.Level} - {reportItem.Type} - {reportItem.Message}");
+                        Console.WriteLine($"{reportItem.TimeStamp.ToString("yyyy-MM-dd HH:mm:ss.ffff")}: {reportItem.Level} - {reportItem.Message}");
                     }
                 }
             }
