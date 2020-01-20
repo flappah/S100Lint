@@ -3,8 +3,8 @@ using System.Collections.Generic;
 
 namespace S100Lint.Model.Interfaces
 {
-    public interface ISchemaParser
+    public interface ISchemaParser : IS100LintBase
     {
-        List<IReportItem> Parse(string schemaFilename, string catalogueFileName);
+        List<IReportItem> Validate(string schemaFilename, string catalogueFileName);
     }
 }

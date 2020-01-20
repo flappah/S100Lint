@@ -6,7 +6,7 @@ using System.Globalization;
 using System.Xml;
 using S100Lint.Types.Interfaces;
 
-namespace S100Lint.Model
+namespace S100Lint.Model.Validation
 {
     public class SchemaSimpleNodeParser : NodeTypeParserBase, ISchemaSimpleNodeParser
     {
@@ -16,11 +16,16 @@ namespace S100Lint.Model
         /// <param name="typeNodes">Nodes to parse</param>
         /// <param name="featureCatalogue">Feature catalogue to use</param>
         /// <returns>List<ReportItem></returns>
-        public override List<IReportItem> Parse(XmlNodeList typeNodes, XmlDocument featureCatalogue)
+        public override List<IReportItem> Parse(XmlNodeList typeNodes, XmlDocument[] xmlSchemas, XmlDocument featureCatalogue)
         {
             if (typeNodes is null)
             {
                 throw new ArgumentNullException(nameof(typeNodes));
+            }
+
+            if (xmlSchemas is null)
+            {
+                throw new ArgumentNullException(nameof(xmlSchemas));
             }
 
             if (featureCatalogue is null)
@@ -42,7 +47,12 @@ namespace S100Lint.Model
                 foreach (XmlNode xmlNode in typeNodes)
                 {
                     // check on the existence of the simpletype in the featurecatalogue
-                    string simpleTypeName = xmlNode.Attributes["name"].Value;
+                    string simpleTypeName = "";
+                    XmlAttribute nameAttribute = FindAttributeByName(xmlNode.Attributes, "name");
+                    if (nameAttribute != null)
+                    {
+                        simpleTypeName = nameAttribute.InnerText;
+                    }
 
                     // sometimes the schema has the typename ended with Type. The catalogue though has it defined without the Type. Check on this
                     if (simpleTypeName.EndsWith("Type", StringComparison.InvariantCulture))
@@ -77,34 +87,34 @@ namespace S100Lint.Model
                     XmlNodeList fcSimpleTypesStrict =
                         featureCatalogue.LastChild.SelectNodes($@"//S100FC:S100_FC_SimpleAttribute[S100FC:code='{simpleTypeName}']", fcNsmgr);
 
-                    if ((fcSimpleTypesStrict == null || fcSimpleTypesStrict.Count == 0) && simpleTypeName.EndsWith("Type"))
+                    if ((fcSimpleTypesStrict == null || fcSimpleTypesStrict.Count == 0) && simpleTypeName.EndsWith("Type", StringComparison.InvariantCulture))
                     {
                         // XML Schema's sometimes use 'Type' added to distinguish between typedefinition and concrete implementation. If there is no
                         // hit if removing the 'Type' results in a hit. If so use this result instread
                         fcSimpleTypesStrict =
-                            featureCatalogue.LastChild.SelectNodes($@"//S100FC:S100_FC_SimpleAttribute[S100FC:code='{simpleTypeName.Replace("Type", "")}']", fcNsmgr);
+                            featureCatalogue.LastChild.SelectNodes($@"//S100FC:S100_FC_SimpleAttribute[S100FC:code='{simpleTypeName.Replace("Type", "", StringComparison.InvariantCulture)}']", fcNsmgr);
                     }
 
                     XmlNodeList fcSimpleTypesLoose =
-                        featureCatalogue.LastChild.SelectNodes($@"//S100FC:S100_FC_SimpleAttribute[translate(S100FC:code, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='{simpleTypeName.ToLower()}']", fcNsmgr);
+                        featureCatalogue.LastChild.SelectNodes($@"//S100FC:S100_FC_SimpleAttribute[translate(S100FC:code, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='{simpleTypeName.ToLower(CultureInfo.InvariantCulture)}']", fcNsmgr);
 
-                    if ((fcSimpleTypesLoose == null || fcSimpleTypesLoose.Count == 0) && simpleTypeName.EndsWith("Type"))
+                    if ((fcSimpleTypesLoose == null || fcSimpleTypesLoose.Count == 0) && simpleTypeName.EndsWith("Type", StringComparison.InvariantCulture))
                     {
                         // XML Schema's sometimes use 'Type' added to distinguish between typedefinition and concrete implementation. If there is no
                         // hit if removing the 'Type' results in a hit. If so use this result instread
                         fcSimpleTypesLoose =
-                            featureCatalogue.LastChild.SelectNodes($@"//S100FC:S100_FC_SimpleAttribute[translate(S100FC:code, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='{simpleTypeName.Replace("Type", "").ToLower()}']", fcNsmgr);
+                            featureCatalogue.LastChild.SelectNodes($@"//S100FC:S100_FC_SimpleAttribute[translate(S100FC:code, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='{simpleTypeName.Replace("Type", "", StringComparison.InvariantCulture).ToLower(CultureInfo.InvariantCulture)}']", fcNsmgr);
                     }
 
                     XmlNodeList fcSimpleTypesAlias =
                         featureCatalogue.LastChild.SelectNodes($@"//S100FC:S100_FC_SimpleAttribute[S100FC:alias='{simpleTypeName}']", fcNsmgr);
 
-                    if ((fcSimpleTypesAlias == null || fcSimpleTypesAlias.Count == 0) && simpleTypeName.EndsWith("Type"))
+                    if ((fcSimpleTypesAlias == null || fcSimpleTypesAlias.Count == 0) && simpleTypeName.EndsWith("Type", StringComparison.InvariantCulture))
                     {
                         // XML Schema's sometimes use 'Type' added to distinguish between typedefinition and concrete implementation. If there is no
                         // hit if removing the 'Type' results in a hit. If so use this result instread
                         fcSimpleTypesAlias =
-                            featureCatalogue.LastChild.SelectNodes($@"//S100FC:S100_FC_SimpleAttribute[S100FC:alias='{simpleTypeName.Replace("Type", "")}']", fcNsmgr);
+                            featureCatalogue.LastChild.SelectNodes($@"//S100FC:S100_FC_SimpleAttribute[S100FC:alias='{simpleTypeName.Replace("Type", "", StringComparison.InvariantCulture)}']", fcNsmgr);
                     }
 
                     if (fcSimpleTypesStrict == null || fcSimpleTypesStrict.Count == 0)
@@ -126,7 +136,7 @@ namespace S100Lint.Model
                                 {
                                     Level = Enumerations.Level.Error,
                                     Type = Enumerations.Type.SimpleType,
-                                    Message = $"{simpleTypeName} is spelled with a different set of upper- and lower case characters ('{simpleTypeName}') where it should be '{nodeName}')",
+                                    Message = $"{simpleTypeName} is spelled with a different set of upper- and lower case characters ('{simpleTypeName}' where it should be '{nodeName}')",
                                     TimeStamp = DateTime.Now
                                 });
                         }
@@ -158,15 +168,15 @@ namespace S100Lint.Model
                     var attributeParser = new SimpleNodeAttributesParser();
                     if (fcSimpleTypesStrict != null && fcSimpleTypesStrict.Count > 0)
                     {
-                        issues.AddRange(attributeParser.Parse(xmlNode, xsdNsmgr, fcSimpleTypesStrict[0], fcNsmgr));
+                        issues.AddRange(attributeParser.Parse(xmlNode, xsdNsmgr, xmlSchemas, fcSimpleTypesStrict[0], fcNsmgr));
                     }
                     else if (fcSimpleTypesLoose != null && fcSimpleTypesLoose.Count > 0)
                     {
-                        issues.AddRange(attributeParser.Parse(xmlNode, xsdNsmgr, fcSimpleTypesLoose[0], fcNsmgr));
+                        issues.AddRange(attributeParser.Parse(xmlNode, xsdNsmgr, xmlSchemas, fcSimpleTypesLoose[0], fcNsmgr));
                     }
                     else if (fcSimpleTypesAlias != null && fcSimpleTypesAlias.Count > 0)
                     {
-                        issues.AddRange(attributeParser.Parse(xmlNode, xsdNsmgr, fcSimpleTypesAlias[0], fcNsmgr));
+                        issues.AddRange(attributeParser.Parse(xmlNode, xsdNsmgr, xmlSchemas, fcSimpleTypesAlias[0], fcNsmgr));
                     }
                 }
             }

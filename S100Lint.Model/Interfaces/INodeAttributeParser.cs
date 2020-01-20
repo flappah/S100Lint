@@ -6,6 +6,6 @@ namespace S100Lint.Model.Interfaces
 {
     public interface INodeAttributeParser
     {
-        List<IReportItem> Parse(XmlNode schemaNode, XmlNamespaceManager schemaNamespaceManager, XmlNode catalogueNode, XmlNamespaceManager catalogueNamespaceManager);
+        List<IReportItem> Parse(XmlNode schemaNode, XmlNamespaceManager schemaNamespaceManager, XmlDocument[] xmlSchemas, XmlNode catalogueNode, XmlNamespaceManager catalogueNamespaceManager);
     }
 }

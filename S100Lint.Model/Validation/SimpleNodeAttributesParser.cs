@@ -6,7 +6,7 @@ using System.Globalization;
 using System.Xml;
 using S100Lint.Types.Interfaces;
 
-namespace S100Lint.Model
+namespace S100Lint.Model.Validation
 {
     public class SimpleNodeAttributesParser : NodeAttributeParserBase, ISimpleNodeAttributesParser
     {
@@ -15,10 +15,11 @@ namespace S100Lint.Model
         /// </summary>
         /// <param name="schemaNode"></param>
         /// <param name="schemaNamespaceManager"></param>
+        /// <param name="xmlSchemas"></param>
         /// <param name="catalogueNode"></param>
         /// <param name="catalogueNamespaceManager"></param>
         /// <returns>List<ReportItem></returns>
-        public override List<IReportItem> Parse(XmlNode schemaNode, XmlNamespaceManager schemaNamespaceManager, XmlNode catalogueNode, XmlNamespaceManager catalogueNamespaceManager)
+        public override List<IReportItem> Parse(XmlNode schemaNode, XmlNamespaceManager schemaNamespaceManager, XmlDocument[] xmlSchemas, XmlNode catalogueNode, XmlNamespaceManager catalogueNamespaceManager)
         {
             if (schemaNode is null)
             {
@@ -28,6 +29,11 @@ namespace S100Lint.Model
             if (schemaNamespaceManager is null)
             {
                 throw new ArgumentNullException(nameof(schemaNamespaceManager));
+            }
+
+            if (xmlSchemas is null)
+            {
+                throw new ArgumentNullException(nameof(xmlSchemas));
             }
 
             if (catalogueNode is null)
@@ -84,7 +90,7 @@ namespace S100Lint.Model
                                         new ReportItem
                                         {
                                             Level = Enumerations.Level.Error,
-                                            Message = $"Attribute with enumeration-value '{label}' is not defined for SimpleType '{schemaNode.Attributes[0].Value}'",
+                                            Message = $"Enumeration-value '{label}' is not defined for SimpleType '{schemaNode.Attributes[0].Value}'",
                                             TimeStamp = DateTime.Now,
                                             Type = Enumerations.Type.SimpleAttribute
                                         });

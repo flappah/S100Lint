@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Xml;
 
-namespace S100Lint.Model
+namespace S100Lint.Model.Validation
 {
     public class SchemaComplexNodeParser : NodeTypeParserBase, ISchemaComplexNodeParser
     {
@@ -15,13 +15,19 @@ namespace S100Lint.Model
         /// Parse nodes and validate them against the catalogue
         /// </summary>
         /// <param name="typeNodes">Nodes to parse</param>
+        /// <param name="xmlSchemas"></param>
         /// <param name="featureCatalogue">Feature catalogue to use</param>
         /// <returns>List<ReportItem></returns>
-        public override List<IReportItem> Parse(XmlNodeList typeNodes, XmlDocument featureCatalogue)
+        public override List<IReportItem> Parse(XmlNodeList typeNodes, XmlDocument[] xmlSchemas, XmlDocument featureCatalogue)
         {
             if (typeNodes is null)
             {
                 throw new ArgumentNullException(nameof(typeNodes));
+            }
+
+            if (xmlSchemas is null)
+            {
+                throw new ArgumentNullException(nameof(xmlSchemas));
             }
 
             if (featureCatalogue is null)
@@ -45,24 +51,23 @@ namespace S100Lint.Model
                     bool isAbstract = false;
                     if (xmlNode.Attributes != null && xmlNode.Attributes.Count > 0)
                     {
-                        foreach (XmlAttribute attribute in xmlNode.Attributes)
+                        var abstractAttribute = FindAttributeByName(xmlNode.Attributes, "abstract");
+                        if (abstractAttribute != null)
                         {
-                            if (attribute.Name == "abstract")
-                            {
-                                if (attribute.Value.ToLower(CultureInfo.InvariantCulture) == "true")
-                                {
-                                    isAbstract = true;
-                                    break;
-                                }
-                            }
+                            isAbstract = abstractAttribute.Value.ToLower(CultureInfo.InvariantCulture) == "true";
                         }
                     }
 
                     if (!isAbstract) // only validate concrete types
                     {
                         // determine the complextype - type
-                        string complexTypeName = xmlNode.Attributes["name"].Value;
-
+                        string complexTypeName = "";
+                        var nameAttribute = FindAttributeByName(xmlNode.Attributes, "name");
+                        if (nameAttribute != null)
+                        {
+                            complexTypeName = nameAttribute.Value;
+                        }
+                        
                         // sometimes the schema has the typename ended with Type. The catalogue though has it defined without the Type. Check on this
                         if (complexTypeName.EndsWith("Type", StringComparison.InvariantCulture))
                         {
@@ -114,23 +119,23 @@ namespace S100Lint.Model
                         XmlNodeList overallcheckNodeListStrict =
                                 featureCatalogue.LastChild.SelectNodes($@"//S100FC:code[.='{complexTypeName}']", fcNsmgr);
 
-                        if ((overallcheckNodeListStrict == null || overallcheckNodeListStrict.Count == 0) && complexTypeName.EndsWith("Type"))
+                        if ((overallcheckNodeListStrict == null || overallcheckNodeListStrict.Count == 0) && complexTypeName.EndsWith("Type", StringComparison.InvariantCulture))
                         { 
                             // XML Schema's sometimes use 'Type' added to distinguish between typedefinition and concrete implementation. If there is no
                             // hit if removing the 'Type' results in a hit. If so use this result instread
                             overallcheckNodeListStrict =
-                                featureCatalogue.LastChild.SelectNodes($@"//S100FC:code[.='{complexTypeName.Replace("Type", "")}']", fcNsmgr);
+                                featureCatalogue.LastChild.SelectNodes($@"//S100FC:code[.='{complexTypeName.Replace("Type", "", StringComparison.InvariantCulture)}']", fcNsmgr);
                         }
 
                         XmlNodeList overallcheckNodeListLoose =
                                 featureCatalogue.LastChild.SelectNodes($@"//S100FC:code[translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='{complexTypeName.ToLower(CultureInfo.InvariantCulture)}']", fcNsmgr);
 
-                        if ((overallcheckNodeListLoose == null || overallcheckNodeListLoose.Count == 0) && complexTypeName.EndsWith("Type"))
+                        if ((overallcheckNodeListLoose == null || overallcheckNodeListLoose.Count == 0) && complexTypeName.EndsWith("Type", StringComparison.InvariantCulture))
                         {
                             // XML Schema's sometimes use 'Type' added to distinguish between typedefinition and concrete implementation. If there is no
                             // hit if removing the 'Type' results in a hit. If so use this result instread
                             overallcheckNodeListLoose =
-                                featureCatalogue.LastChild.SelectNodes($@"//S100FC:code[translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='{complexTypeName.Replace("Type", "").ToLower(CultureInfo.InvariantCulture)}']", fcNsmgr);
+                                featureCatalogue.LastChild.SelectNodes($@"//S100FC:code[translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='{complexTypeName.Replace("Type", "", StringComparison.InvariantCulture).ToLower(CultureInfo.InvariantCulture)}']", fcNsmgr);
                         }
 
                         var parentNodeTypeName =
@@ -179,7 +184,7 @@ namespace S100Lint.Model
                                     {
                                         Level = Enumerations.Level.Error,
                                         Type = Enum.Parse<Enumerations.Type>(parentNodeTypeName, true),
-                                        Message = $"{complexTypeName} is spelled with a different set of upper- and lower case characters ('{complexTypeName}') where it should be '{overallcheckNodeListLoose[0].InnerText}')",
+                                        Message = $"{complexTypeName} is spelled with a different set of upper- and lower case characters ('{complexTypeName}' where it should be '{overallcheckNodeListLoose[0].InnerText}')",
                                         TimeStamp = DateTime.Now
                                     };
                         }
@@ -203,11 +208,11 @@ namespace S100Lint.Model
                         var attributeParser = new ComplexNodeAttributesParser();
                         if (overallcheckNodeListStrict != null && overallcheckNodeListStrict.Count > 0)
                         {
-                            issues.AddRange(attributeParser.Parse(xmlNode, xsdNsmgr, overallcheckNodeListStrict[0], fcNsmgr));
+                            issues.AddRange(attributeParser.Parse(xmlNode, xsdNsmgr, xmlSchemas, overallcheckNodeListStrict[0], fcNsmgr));
                         }
                         else if (overallcheckNodeListLoose != null && overallcheckNodeListLoose.Count > 0)
                         {
-                            issues.AddRange(attributeParser.Parse(xmlNode, xsdNsmgr, overallcheckNodeListLoose[0], fcNsmgr));
+                            issues.AddRange(attributeParser.Parse(xmlNode, xsdNsmgr, xmlSchemas, overallcheckNodeListLoose[0], fcNsmgr));
                         }
 
                         if (reportItem != null)

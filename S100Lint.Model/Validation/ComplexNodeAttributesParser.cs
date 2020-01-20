@@ -1,11 +1,13 @@
-﻿using S100Lint.Model.Interfaces;
+﻿using S100Lint.Base;
+using S100Lint.Model.Interfaces;
 using S100Lint.Types;
 using S100Lint.Types.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Xml;
 
-namespace S100Lint.Model
+namespace S100Lint.Model.Validation
 {
     public class ComplexNodeAttributesParser : NodeAttributeParserBase, IComplexNodeAttributesParser
     {
@@ -14,10 +16,11 @@ namespace S100Lint.Model
         /// </summary>
         /// <param name="schemaNode"></param>
         /// <param name="schemaNamespaceManager"></param>
+        /// <param name="xmlSchemas"></param>
         /// <param name="catalogueNode"></param>
         /// <param name="catalogueNamespaceManager"></param>
         /// <returns>List<ReportItem></returns>
-        public override List<IReportItem> Parse(XmlNode schemaNode, XmlNamespaceManager schemaNamespaceManager, XmlNode catalogueNode, XmlNamespaceManager catalogueNamespaceManager)
+        public override List<IReportItem> Parse(XmlNode schemaNode, XmlNamespaceManager schemaNamespaceManager, XmlDocument[] xmlSchemas, XmlNode catalogueNode, XmlNamespaceManager catalogueNamespaceManager)
         {
             if (schemaNode is null)
             {
@@ -29,6 +32,11 @@ namespace S100Lint.Model
                 throw new ArgumentNullException(nameof(schemaNamespaceManager));
             }
 
+            if (xmlSchemas is null)
+            {
+                throw new ArgumentNullException(nameof(xmlSchemas));
+            }
+
             if (catalogueNode is null)
             {
                 throw new ArgumentNullException(nameof(catalogueNode));
@@ -38,6 +46,20 @@ namespace S100Lint.Model
             {
                 throw new ArgumentNullException(nameof(catalogueNamespaceManager));
             }
+
+            var validTypes = new Dictionary<string, string>()
+            {
+                { "string", "string, text" },
+                { "double", "float, real" },
+                { "anyuri", "url" },
+                { "date", "text, date" },
+                { "integer", "integer" },
+                { "boolean", "boolean" },
+                { "positiveinteger", "integer" },
+                { "nonnegativeinteger", "integer" },
+                { "time", "time" },
+                { "decimal", "integer, float, real, decimal" }
+            };
 
             var items = new List<IReportItem>();
 
@@ -70,20 +92,20 @@ namespace S100Lint.Model
                 {
                     if (subAttributeNode != null && subAttributeNode.ChildNodes.Count > 0)
                     {
-                        string attributeNameToCheck = "";
+                        string schemaAttributeNameToCheck = "";
                         foreach (XmlNode childNode in subAttributeNode.ChildNodes)
                         {
                             if (childNode.Name.Equals("S100FC:attribute", StringComparison.InvariantCulture) && childNode.Attributes != null && childNode.Attributes.Count > 0)
                             {
-                                attributeNameToCheck = childNode.Attributes[0].InnerText;
+                                schemaAttributeNameToCheck = childNode.Attributes[0].InnerText;
                                 break;
                             }
                         }
 
-                        if (!String.IsNullOrEmpty(attributeNameToCheck))
+                        if (!String.IsNullOrEmpty(schemaAttributeNameToCheck))
                         {
                             var schemaNodeStrictNode =
-                                schemaNode.SelectSingleNode($@"xs:sequence/xs:element[@name='{attributeNameToCheck}']", schemaNamespaceManager);
+                                schemaNode.SelectSingleNode($@"xs:sequence/xs:element[@name='{schemaAttributeNameToCheck}']", schemaNamespaceManager);
 
                             // validates the existence of all elements defined in the catalogue for the specified complextype
                             if (schemaNodeStrictNode == null || schemaNode.Attributes == null || schemaNode.Attributes.Count == 0)
@@ -91,7 +113,7 @@ namespace S100Lint.Model
                                 items.Add(new ReportItem
                                 {
                                     Level = Enumerations.Level.Error,
-                                    Message = $"Element '{attributeNameToCheck}' is not defined for ComplexType '{complexTypeName}'",
+                                    Message = $"Element '{schemaAttributeNameToCheck}' is not defined for ComplexType '{complexTypeName}'",
                                     TimeStamp = DateTime.Now,
                                     Type = Enumerations.Type.ComplexAttribute
                                 });
@@ -99,33 +121,61 @@ namespace S100Lint.Model
                             else
                             {
                                 // if type is a SimpleType or ComplexType which has to be defined in the schema, check if the definition exists in the schema
-                                var attributeTypeToCheck = "";
+                                var schemaAttributeType = "";
                                 foreach (XmlAttribute attribute in schemaNodeStrictNode.Attributes)
                                 {
                                     if (attribute.Name == "type")
                                     {
-                                        attributeTypeToCheck = attribute.InnerText;
+                                        schemaAttributeType = attribute.InnerText;
                                         break;
                                     }
                                 }
 
-                                if (!attributeTypeToCheck.Contains(":", StringComparison.InvariantCulture))
+                                if (!schemaAttributeType.Contains(":", StringComparison.InvariantCulture))
                                 {
-                                    XmlNode simleTypeCheckNode =
-                                        schemaNode.OwnerDocument.LastChild.SelectSingleNode($@"//xs:simpleType[@name='{attributeTypeToCheck}']", schemaNamespaceManager);
+                                    XmlNode simpleTypeCheckNode =
+                                        SelectSingleNode(xmlSchemas, $@"//xs:simpleType[@name='{schemaAttributeType}']", schemaNamespaceManager);
 
                                     XmlNode complexTypeCheckNode =
-                                        schemaNode.OwnerDocument.LastChild.SelectSingleNode($@"xs:complexType[@name='{attributeTypeToCheck}']", schemaNamespaceManager);
+                                        SelectSingleNode(xmlSchemas, $@"//xs:complexType[@name='{schemaAttributeType}']", schemaNamespaceManager);
 
-                                    if (simleTypeCheckNode == null && complexTypeCheckNode == null)
+                                    if (simpleTypeCheckNode == null && complexTypeCheckNode == null)
                                     {
                                         items.Add(new ReportItem
                                         {
                                             Level = Enumerations.Level.Error,
-                                            Message = $"Referenced {(simleTypeCheckNode != null ? "SimpleType" : "ComplexType")} '{attributeTypeToCheck}' for '{attributeNameToCheck}' in ComplexType '{complexTypeName}' is not defined in the schema",
+                                            Message = $"Referenced {(simpleTypeCheckNode != null ? "SimpleType" : "ComplexType")} '{schemaAttributeType}' for '{schemaAttributeNameToCheck}' in ComplexType '{complexTypeName}' is not defined in the schema",
                                             TimeStamp = DateTime.Now,
                                             Type = Enumerations.Type.ComplexAttribute
                                         });
+                                    }
+                                }
+                                else
+                                {
+                                    // if type is defined check if the types in both schema and catalogue are compatible
+                                    var referencedCatalogueTypeNodeList =
+                                        catalogueNode.OwnerDocument.LastChild.SelectNodes($@"//S100FC:S100_FC_SimpleAttribute/S100FC:code[.='{schemaAttributeNameToCheck}']", catalogueNamespaceManager);
+
+                                    if (referencedCatalogueTypeNodeList != null && referencedCatalogueTypeNodeList.Count > 0)
+                                    {
+                                        var referencedCatalogueTypeNode =
+                                            referencedCatalogueTypeNodeList[0].ParentNode.SelectSingleNode($@"S100FC:valueType", catalogueNamespaceManager);
+
+                                        if (referencedCatalogueTypeNode != null)
+                                        {
+                                            string catalogueAttributeType = referencedCatalogueTypeNode.InnerText;
+
+                                            if (!validTypes[schemaAttributeType.ToLower(CultureInfo.InvariantCulture).LastPart(":")].Contains(catalogueAttributeType.ToLower(CultureInfo.InvariantCulture), StringComparison.InvariantCulture))
+                                            {
+                                                items.Add(new ReportItem
+                                                {
+                                                    Level = Enumerations.Level.Error,
+                                                    Message = $"Attribute {schemaAttributeNameToCheck} of type '{complexTypeName}' has an invalid type with respect to the catalogue ({schemaAttributeType} vs {catalogueAttributeType})",
+                                                    TimeStamp = DateTime.Now,
+                                                    Type = Enumerations.Type.ComplexAttribute
+                                                });
+                                            }
+                                        }
                                     }
                                 }
 
@@ -157,7 +207,7 @@ namespace S100Lint.Model
                                                 items.Add(new ReportItem
                                                 {
                                                     Level = Enumerations.Level.Error,
-                                                    Message = $"Element '{attributeNameToCheck}' in ComplexType '{complexTypeName}' its minOccurs value is not equal to the catalogue ({attribute.InnerText} vs {lowerValue})",
+                                                    Message = $"Attribute '{schemaAttributeNameToCheck}' in ComplexType '{complexTypeName}' its minOccurs value is not equal to the catalogue ({attribute.InnerText} vs {lowerValue})",
                                                     TimeStamp = DateTime.Now,
                                                     Type = Enumerations.Type.ComplexAttribute
                                                 });
@@ -170,7 +220,7 @@ namespace S100Lint.Model
                                                 items.Add(new ReportItem
                                                 {
                                                     Level = Enumerations.Level.Error,
-                                                    Message = $"Element '{attributeNameToCheck}' in ComplexType '{complexTypeName}' its maxOccurs value is not equal to the catalogue ({attribute.InnerText} vs {upperValue})",
+                                                    Message = $"Attribute '{schemaAttributeNameToCheck}' in ComplexType '{complexTypeName}' its maxOccurs value is not equal to the catalogue ({attribute.InnerText} vs {upperValue})",
                                                     TimeStamp = DateTime.Now,
                                                     Type = Enumerations.Type.ComplexAttribute
                                                 });

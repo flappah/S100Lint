@@ -10,13 +10,13 @@ namespace S100Lint
 #if DEBUG
             if (args.Length == 0)
             {
-                args = new[] { "S122.XSD", "S122_FC.XML" };
+                args = new[] { "S127.XSD", "S127_FC.XML" };
             }
 #endif 
 
             if (args.Length != 2)
             {
-                Console.WriteLine("Invalid syntax for S100Lint. Valid syntax is S100Lint {SchemaFileName} {FeatureCatalogueFileName}");
+                Console.WriteLine("Invalid syntax for S100Lint. Valid syntax is S100Lint [SchemaFileName] [FeatureCatalogueFileName]");
             }
             else 
             {
@@ -26,7 +26,7 @@ namespace S100Lint
                 Console.WriteLine($"Validating schemafile '{schemaFile}' with feature catalogue '{featureCatalogueFile}'.");
 
                 var schemaParser = new SchemaParser();
-                var reportItems = schemaParser.Parse(schemaFile, featureCatalogueFile);
+                var reportItems = schemaParser.Validate(schemaFile, featureCatalogueFile);
 
                 foreach (var reportItem in reportItems)
                 {
