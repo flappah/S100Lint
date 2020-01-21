@@ -96,7 +96,7 @@ namespace S100Lint.Model.XReference
                                         items.Add(new ReportItem
                                         {
                                             Level = Enumerations.Level.Warning,
-                                            Message = $"SimpleType '{nameAttribute.InnerText}' in the first schema is different from the type in the target schema",
+                                            Message = $"SimpleType '{nameAttribute.InnerText}' in the first schema is different from the type in the second schema",
                                             TimeStamp = DateTime.Now,
                                             Type = Enumerations.Type.SimpleType
                                         });
