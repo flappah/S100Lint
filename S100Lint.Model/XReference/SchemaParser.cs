@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using S100Lint.Base;
+﻿using S100Lint.Model.Interfaces;
 using S100Lint.Types;
-using System.Collections;
 using S100Lint.Types.Interfaces;
-using System.Xml;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Xml;
 
 namespace S100Lint.Model.XReference
 {
-    public class SchemaParser : S100LintBase
+    public class SchemaParser : S100LintBase, ISchemaParser
     {
         public virtual List<IReportItem> Parse(XmlDocument[] sourceSchemas, XmlDocument[] targetSchemas)
         {
@@ -35,11 +33,11 @@ namespace S100Lint.Model.XReference
                 {
                     XmlNodeList simpleNodes = schema.LastChild.SelectNodes($@"xs:simpleType", xsdNsmgr);
                     sourceSimpleNodes.AddRange(from XmlNode simpleNode in simpleNodes
-                                         select simpleNode);
+                                               select simpleNode);
 
                     XmlNodeList complexNodes = schema.LastChild.SelectNodes($@"xs:complexType", xsdNsmgr);
                     sourceComplexNodes.AddRange(from XmlNode complexNode in complexNodes
-                                         select complexNode);
+                                                select complexNode);
                 }
 
                 return Analyse(sourceSimpleNodes, sourceComplexNodes, targetSchemas, xsdNsmgr);
@@ -77,7 +75,7 @@ namespace S100Lint.Model.XReference
 
             if (sourceSimpleNodes.Count > 0 && targetSchemas.Length > 0)
             {
-                foreach(XmlNode sourceSimpleNode in sourceSimpleNodes)
+                foreach (XmlNode sourceSimpleNode in sourceSimpleNodes)
                 {
                     XmlAttribute nameAttribute = FindAttributeByName(sourceSimpleNode.Attributes, "name");
                     if (nameAttribute != null && !String.IsNullOrEmpty(nameAttribute.InnerText))
@@ -110,7 +108,7 @@ namespace S100Lint.Model.XReference
 
             if (sourceComplexNodes.Count > 0 && targetSchemas.Length > 0)
             {
-                foreach(XmlNode sourceComplexNode in sourceComplexNodes)
+                foreach (XmlNode sourceComplexNode in sourceComplexNodes)
                 {
                     XmlAttribute nameAttribute = FindAttributeByName(sourceComplexNode.Attributes, "name");
                     if (nameAttribute != null && !String.IsNullOrEmpty(nameAttribute.InnerText))
