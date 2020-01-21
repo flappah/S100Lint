@@ -83,18 +83,19 @@ namespace S100Lint.Model.XReference
                         var targetSimpleNode = SelectSingleNode(targetSchemas, $@"xs:simpleType[@name='{nameAttribute.InnerText}']", namespaceManager);
                         if (targetSimpleNode != null && targetSimpleNode.HasChildNodes)
                         {
-                            var targetRestrictionNode = targetSimpleNode.SelectSingleNode(@"xs:restriction", namespaceManager);
-                            if (targetRestrictionNode != null && targetRestrictionNode.HasChildNodes)
+                            foreach(XmlNode targetChildNode in targetSimpleNode.ChildNodes)
                             {
-                                var sourceRestrictionNode = sourceSimpleNode.SelectSingleNode(@"xs:restriction", namespaceManager);
-                                if (sourceRestrictionNode != null && sourceRestrictionNode.HasChildNodes)
+                                var comparableSourceChildNode =
+                                    sourceSimpleNode.SelectSingleNode(targetChildNode.Name, namespaceManager);
+
+                                if (comparableSourceChildNode != null && comparableSourceChildNode.HasChildNodes)
                                 {
-                                    if (sourceRestrictionNode.InnerXml != targetRestrictionNode.InnerXml)
+                                    if (comparableSourceChildNode.InnerXml != targetChildNode.InnerXml)
                                     {
                                         items.Add(new ReportItem
                                         {
                                             Level = Enumerations.Level.Warning,
-                                            Message = $"SimpleType '{nameAttribute.InnerText}' in the first schema is different from the type in the second schema",
+                                            Message = $"The XmlNode '{targetChildNode.Name}' in SimpleType '{nameAttribute.InnerText}' in the first schema is different from the same XmlNode in the second schema",
                                             TimeStamp = DateTime.Now,
                                             Type = Enumerations.Type.SimpleType
                                         });
@@ -116,18 +117,19 @@ namespace S100Lint.Model.XReference
                         var targetComplexNode = SelectSingleNode(targetSchemas, $@"xs:complexType[@name='{nameAttribute.InnerText}']", namespaceManager);
                         if (targetComplexNode != null && targetComplexNode.HasChildNodes)
                         {
-                            var targetComplexContentNode = targetComplexNode.SelectSingleNode(@"xs:complexContent", namespaceManager);
-                            if (targetComplexContentNode != null && targetComplexContentNode.HasChildNodes)
+                            foreach(XmlNode targetChildNode in targetComplexNode.ChildNodes)
                             {
-                                var sourceComplexContentNode = sourceComplexNode.SelectSingleNode(@"xs:complexContent", namespaceManager);
-                                if (sourceComplexContentNode != null && sourceComplexContentNode.HasChildNodes)
+                                var comparableSourceChildNode =
+                                    sourceComplexNode.SelectSingleNode(targetChildNode.Name, namespaceManager);
+
+                                if (comparableSourceChildNode != null && comparableSourceChildNode.HasChildNodes)
                                 {
-                                    if (sourceComplexContentNode.InnerXml != targetComplexContentNode.InnerXml)
+                                    if (comparableSourceChildNode.InnerXml != targetChildNode.InnerXml)
                                     {
                                         items.Add(new ReportItem
                                         {
                                             Level = Enumerations.Level.Warning,
-                                            Message = $"ComplexType '{nameAttribute.InnerText}' in the first schema is different from the type in the second schema",
+                                            Message = $"The XmlNode '{targetChildNode.Name}' in ComplexType '{nameAttribute.InnerText}' in the first schema is different from the same XmlNode in the second schema",
                                             TimeStamp = DateTime.Now,
                                             Type = Enumerations.Type.SimpleType
                                         });

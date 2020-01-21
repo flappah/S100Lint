@@ -12,7 +12,7 @@ namespace S100Lint
 #if DEBUG
             if (args.Length == 0)
             {
-                args = new[] { "S122.XSD", "S123.XSD" };
+                args = new[] { "S123.XSD", "S127.XSD" };
             }
 #endif 
 
