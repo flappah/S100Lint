@@ -1,5 +1,7 @@
 ﻿using S100Lint.Model;
+using S100Lint.Types.Interfaces;
 using System;
+using System.Collections.Generic;
 
 namespace S100Lint
 {
@@ -20,13 +22,21 @@ namespace S100Lint
             }
             else 
             {
-                var schemaFile = args[0];
-                var featureCatalogueFile = args[1];
+                var file1 = args[0];
+                var file2 = args[1];
+                var reportItems = new List<IReportItem>();
+                var schemaParser = new SchemaAnalyser();
 
-                Console.WriteLine($"Validating schemafile '{schemaFile}' with feature catalogue '{featureCatalogueFile}'.");
-
-                var schemaParser = new SchemaParser();
-                var reportItems = schemaParser.Validate(schemaFile, featureCatalogueFile);
+                if (file2.ToLower().Contains(".xsd"))
+                {
+                    Console.WriteLine($"Cross referencing schemafile '{file1}' with schemafile '{file2}'.");
+                    reportItems = schemaParser.XReference(file1, file2);
+                }
+                else
+                {
+                    Console.WriteLine($"Validating schemafile '{file1}' with feature catalogue '{file2}'.");
+                    reportItems = schemaParser.Validate(file1, file2);
+                }
 
                 foreach (var reportItem in reportItems)
                 {

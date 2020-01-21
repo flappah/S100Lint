@@ -6,8 +6,32 @@ using System.Xml;
 
 namespace S100Lint.Model
 {
-    public class SchemaParser : S100LintBase, ISchemaParser
+    public class SchemaAnalyser : S100LintBase, ISchemaAnalyser
     {
+        /// <summary>
+        /// Method cross references two schema files to search for commonalities and verifies if those 
+        /// commonolities contains no differences
+        /// </summary>
+        /// <param name="schemaFileNameSource"></param>
+        /// <param name="schemaFileNameTarget"></param>
+        /// <returns></returns>
+        public virtual List<IReportItem> XReference(string schemaFileNameSource, string schemaFileNameTarget)
+        {
+            var xmlFileReader = new XmlFileReader();
+            var issues = new List<IReportItem>();
+
+            var xmlSourceSchema = xmlFileReader.Read(schemaFileNameSource);
+            var xmlTargetSchema = xmlFileReader.Read(schemaFileNameTarget);
+
+            if (xmlSourceSchema.HasChildNodes && xmlTargetSchema.HasChildNodes)
+            {
+
+            }
+
+            return issues;
+        }
+
+
         /// <summary>
         /// Validates the specified schema file with the specified catalogue file
         /// </summary>

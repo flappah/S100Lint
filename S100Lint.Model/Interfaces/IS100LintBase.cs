@@ -6,6 +6,7 @@ namespace S100Lint.Model.Interfaces
     {
         XmlAttribute FindAttributeByName(XmlAttributeCollection collection, string attributeName);
         XmlAttribute FindAttributeByValue(XmlAttributeCollection collection, string attributeValue);
+        XmlNode GetToplevelElement(XmlNode fromNode, XmlNamespaceManager xmlNsManager, string expression);
         XmlNodeList SelectNodes(XmlDocument[] documents, string expression, XmlNamespaceManager nsm);
         XmlNode SelectSingleNode(XmlDocument[] documents, string expression, XmlNamespaceManager nsm);
     }

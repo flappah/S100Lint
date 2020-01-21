@@ -99,9 +99,7 @@ namespace S100Lint.Model.Validation
                             {
                                 // if the node is derived from any other type than informationtype or featuretype go and see of which type
                                 // the basetype is derived from. This only goes one level deep though. 
-
-                                var xmlTools = new XmlTools();
-                                var parentTypeNode = xmlTools.GetToplevelElement(xmlNode, xsdNsmgr, @"xs:complexContent/xs:extension");
+                                var parentTypeNode = GetToplevelElement(xmlNode, xsdNsmgr, @"xs:complexContent/xs:extension");
 
                                 if (parentTypeNode != null && parentTypeNode.HasChildNodes)
                                 {
