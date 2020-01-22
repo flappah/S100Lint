@@ -1,5 +1,4 @@
 ﻿using S100Lint.Model.Interfaces;
-using S100Lint.Types;
 using S100Lint.Types.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -79,6 +78,11 @@ namespace S100Lint.Model.XReference
             if (targetSchemas is null)
             {
                 throw new ArgumentNullException(nameof(targetSchemas));
+            }
+
+            if (namespaceManager is null)
+            {
+                throw new ArgumentNullException(nameof(namespaceManager));
             }
 
             var items = new List<IReportItem>();

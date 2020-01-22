@@ -69,6 +69,8 @@ namespace S100Lint.Model.XReference
                     }
                     else
                     {
+                        // lowest level (usually the text) is represented as a node which name contains a hash symbol. No targetnode 
+                        // needs to be selected
                         if (sourceChildNode.Name.Contains("#", StringComparison.InvariantCulture))
                         {
                             comparableTargetChildNode = targetNode.FirstChild;
@@ -95,6 +97,7 @@ namespace S100Lint.Model.XReference
                             
                             if (originalItemCount == items.Count)
                             {
+                                // render the breadcrumb trail for reporting purposes
                                 string breadCrumbTrail =
                                     GenerateXmlNodeBreadCrumbTrail(sourceChildNode);
 
