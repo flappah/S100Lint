@@ -1,6 +1,7 @@
 ﻿using S100Lint.Model.Interfaces;
 using System;
 using System.Xml;
+using System.Globalization;
 
 namespace S100Lint.Model
 {
@@ -52,6 +53,54 @@ namespace S100Lint.Model
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Generates a breadcrumb trail for a specified XmlNode. It handles elements and enumerations slightly different since
+        /// these elements can occur multiple times in an S1xx XML schema for a given XmlNode.
+        /// </summary>
+        /// <param name="fromNode"></param>
+        /// <returns></returns>
+        public virtual string GenerateXmlNodeBreadCrumbTrail(XmlNode fromNode)
+        {
+            if (fromNode is null)
+            {
+                throw new ArgumentNullException(nameof(fromNode));
+            }
+
+            if (fromNode.Name.ToLower(CultureInfo.InvariantCulture).Contains("simpletype", StringComparison.InvariantCulture) ||
+                fromNode.Name.ToLower(CultureInfo.InvariantCulture).Contains("complextype", StringComparison.InvariantCulture))                
+            {
+                return $"{fromNode.Name}";
+            }
+
+            if (fromNode.ParentNode != null)
+            {
+                if (fromNode.Name.ToLower(CultureInfo.InvariantCulture).Contains("element", StringComparison.InvariantCulture))
+                {
+                    var elementNameAttribute = FindAttributeByName(fromNode.Attributes, "name");
+
+                    if (elementNameAttribute != null)
+                    {
+                        return $"{GenerateXmlNodeBreadCrumbTrail(fromNode.ParentNode)}->{fromNode.Name}[name='{elementNameAttribute.InnerText}']";
+                    }
+                }
+                else if (fromNode.Name.ToLower(CultureInfo.InvariantCulture).Contains("enumeration", StringComparison.InvariantCulture))
+                {
+                    var elementValueAttribute = FindAttributeByName(fromNode.Attributes, "value");
+
+                    if (elementValueAttribute != null)
+                    {
+                        return $"{GenerateXmlNodeBreadCrumbTrail(fromNode.ParentNode)}->{fromNode.Name}[value='{elementValueAttribute.InnerText}']";
+                    }
+                }
+                else
+                {
+                    return $"{GenerateXmlNodeBreadCrumbTrail(fromNode.ParentNode)}->{fromNode.Name}";
+                }
+            }
+
+            return String.Empty;
         }
 
         /// <summary>

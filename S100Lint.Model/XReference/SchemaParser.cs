@@ -81,26 +81,12 @@ namespace S100Lint.Model.XReference
                     if (nameAttribute != null && !String.IsNullOrEmpty(nameAttribute.InnerText))
                     {
                         var targetSimpleNode = SelectSingleNode(targetSchemas, $@"xs:simpleType[@name='{nameAttribute.InnerText}']", namespaceManager);
-                        if (targetSimpleNode != null && targetSimpleNode.HasChildNodes)
+                        if (targetSimpleNode != null && targetSimpleNode.ChildNodes.Count > 0)
                         {
-                            foreach(XmlNode targetChildNode in targetSimpleNode.ChildNodes)
+                            if (targetSimpleNode.InnerXml != sourceSimpleNode.InnerXml)
                             {
-                                var comparableSourceChildNode =
-                                    sourceSimpleNode.SelectSingleNode(targetChildNode.Name, namespaceManager);
-
-                                if (comparableSourceChildNode != null && comparableSourceChildNode.HasChildNodes)
-                                {
-                                    if (comparableSourceChildNode.InnerXml != targetChildNode.InnerXml)
-                                    {
-                                        items.Add(new ReportItem
-                                        {
-                                            Level = Enumerations.Level.Warning,
-                                            Message = $"The XmlNode '{targetChildNode.Name}' in SimpleType '{nameAttribute.InnerText}' in the first schema is different from the same XmlNode in the second schema",
-                                            TimeStamp = DateTime.Now,
-                                            Type = Enumerations.Type.SimpleType
-                                        });
-                                    }
-                                }
+                                var nodeAnalyser = new NodeAnalyser();
+                                items.AddRange(nodeAnalyser.Analyse(nameAttribute.InnerText, sourceSimpleNode, targetSimpleNode, namespaceManager));
                             }
                         }
                     }
@@ -117,24 +103,10 @@ namespace S100Lint.Model.XReference
                         var targetComplexNode = SelectSingleNode(targetSchemas, $@"xs:complexType[@name='{nameAttribute.InnerText}']", namespaceManager);
                         if (targetComplexNode != null && targetComplexNode.HasChildNodes)
                         {
-                            foreach(XmlNode targetChildNode in targetComplexNode.ChildNodes)
+                            if (targetComplexNode.InnerXml != sourceComplexNode.InnerXml)
                             {
-                                var comparableSourceChildNode =
-                                    sourceComplexNode.SelectSingleNode(targetChildNode.Name, namespaceManager);
-
-                                if (comparableSourceChildNode != null && comparableSourceChildNode.HasChildNodes)
-                                {
-                                    if (comparableSourceChildNode.InnerXml != targetChildNode.InnerXml)
-                                    {
-                                        items.Add(new ReportItem
-                                        {
-                                            Level = Enumerations.Level.Warning,
-                                            Message = $"The XmlNode '{targetChildNode.Name}' in ComplexType '{nameAttribute.InnerText}' in the first schema is different from the same XmlNode in the second schema",
-                                            TimeStamp = DateTime.Now,
-                                            Type = Enumerations.Type.SimpleType
-                                        });
-                                    }
-                                }
+                                var nodeAnalyser = new NodeAnalyser();
+                                items.AddRange(nodeAnalyser.Analyse(nameAttribute.InnerText, sourceComplexNode, targetComplexNode, namespaceManager));
                             }
                         }
                     }
