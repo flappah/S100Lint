@@ -16,23 +16,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{865D08E2-3445-4F02-B536-2E1AA9D78866}"
-	ProjectSection(SolutionItems) = preProject
-		Z:\Projects\S100Lint\S100Lint\bin\Debug\netcoreapp3.1\common.xsd = Z:\Projects\S100Lint\S100Lint\bin\Debug\netcoreapp3.1\common.xsd
-		Z:\Projects\S100Lint\S100Lint\bin\Debug\netcoreapp3.1\S100_gmlProfile.xsd = Z:\Projects\S100Lint\S100Lint\bin\Debug\netcoreapp3.1\S100_gmlProfile.xsd
-		Z:\Projects\S100Lint\S100Lint\bin\Debug\netcoreapp3.1\S100_gmlProfileExt.xsd = Z:\Projects\S100Lint\S100Lint\bin\Debug\netcoreapp3.1\S100_gmlProfileExt.xsd
-		Z:\Projects\S100Lint\S100Lint\bin\Debug\netcoreapp3.1\S100_gmlProfileLevels.xsd = Z:\Projects\S100Lint\S100Lint\bin\Debug\netcoreapp3.1\S100_gmlProfileLevels.xsd
-		Z:\Projects\S100Lint\S100Lint\bin\Debug\netcoreapp3.1\s100gmlbase.xsd = Z:\Projects\S100Lint\S100Lint\bin\Debug\netcoreapp3.1\s100gmlbase.xsd
-		Z:\Projects\S100Lint\S100Lint\bin\Debug\netcoreapp3.1\s100gmlbaseExt.xsd = Z:\Projects\S100Lint\S100Lint\bin\Debug\netcoreapp3.1\s100gmlbaseExt.xsd
-		Z:\Projects\S100Lint\S100Lint\bin\Debug\netcoreapp3.1\S122.xsd = Z:\Projects\S100Lint\S100Lint\bin\Debug\netcoreapp3.1\S122.xsd
-		Z:\Projects\S100Lint\S100Lint\bin\Debug\netcoreapp3.1\s122_FC.xml = Z:\Projects\S100Lint\S100Lint\bin\Debug\netcoreapp3.1\s122_FC.xml
-		Z:\Projects\S100Lint\S100Lint\bin\Debug\netcoreapp3.1\S123.xsd = Z:\Projects\S100Lint\S100Lint\bin\Debug\netcoreapp3.1\S123.xsd
-		Z:\Projects\S100Lint\S100Lint\bin\Debug\netcoreapp3.1\S123_FC.xml = Z:\Projects\S100Lint\S100Lint\bin\Debug\netcoreapp3.1\S123_FC.xml
-		Z:\Projects\S100Lint\S100Lint\bin\Debug\netcoreapp3.1\S127.xsd = Z:\Projects\S100Lint\S100Lint\bin\Debug\netcoreapp3.1\S127.xsd
-		Z:\Projects\S100Lint\S100Lint\bin\Debug\netcoreapp3.1\S127_FC.xml = Z:\Projects\S100Lint\S100Lint\bin\Debug\netcoreapp3.1\S127_FC.xml
-		Z:\Projects\S100Lint\S100Lint\bin\Debug\netcoreapp3.1\xlink.xsd = Z:\Projects\S100Lint\S100Lint\bin\Debug\netcoreapp3.1\xlink.xsd
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

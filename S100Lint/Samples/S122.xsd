@@ -1,0 +1,3408 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:S100="http://www.iho.int/s100gml/1.0" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns="http://www.iho.int/S122/gml/1.0" xmlns:S100EXT="http://www.iho.int/s100gml/1.0+EXT" targetNamespace="http://www.iho.int/S122/gml/1.0" elementFormDefault="unqualified" version="1.0.0-20170831">
+	<!-- ============================================================================================= -->
+	<!-- S100 XML/GML Schema for S-122 (Marine Protected Areas).                                       -->
+	<!-- ============================================================================================= -->
+	<!-- =============================================================================================
+Draft Copyright, license, and disclaimer
+© Copyright 2012-2016 ...
+© Copyright 2017 IHB
+
+
+License (Draft)
+Certain parts of this document refer to or are based on the standards, documents, schemas, or other material
+of the International Organization for Standardization (ISO), Open Geospatial Consortium (OGC), International
+Hydrographic Organization / Organisation Hydrographique Internationale (IHO/OHI).
+The ISO material can be obtained from any ISO member and from the Web site of the ISO Central Secretariat
+at www.iso.org.
+The OGC material can be obtained from the OGC Web site at www.opengeospatial.org.
+The IHO material can be obtained from the IHO Web site at www.iho.int or from the International Hydrographic
+Bureau.
+
+Permission to copy and distribute this document is hereby granted provided that this notice is retained
+on all copies, and that IHO & Jeppesen are credited when the material is redistributed or used in
+part or whole in derivative works.
+Redistributions in binary form must reproduce this notice in the documentation and/or other materials
+provided with the distribution.
+
+Disclaimer
+This work is provided by the copyright holders and contributors "as is" and any express or implied warranties,
+including, but not limited to, the implied warranties of merchantability and fitness for a particular purpose
+are disclaimed. In no event shall the copyright owner or contributors be liable for any direct, indirect,
+incidental, special, exemplary, or consequential damages (including, but not limited to, procurement of substitute
+goods or services; loss of use, data, or profits; or business interruption) however caused and on any theory of
+liability, whether in contract, strict liability, or tort (including negligence or otherwise) arising in any way
+out of the use of this software, even if advised of the possibility of such damage.
+
+Document history
+Draft 0.5	2015-6-12	Raphael Malyankar (Jeppesen)	Initial version
+Draft 0.2	2015-12-02	Raphael Malyankar (Jeppesen)	Updated to conform to 20151202 model
+Contributors:	 Raphael Malyankar (Jeppesen) (RMM)		July 2012		Initial draft
+Version 0.2.0 September 2012    TXTCON, data quality, coverage added
+Version 0.3.0 December 2012     updated spatial attribute, substitution groups of elements for GML 3.2.1, NS and location of imported S100 schema
+Version 0.4.0 adapted to use TSMAD S-100 GML profile, S-122 1.0 name space, and S-101 style complex attributes for date ranges and S-100 truncated date type
+Version 0.4.1 December 2014 updated with new text content model from SNPWG 18, add Supplementary Information from S-101 (April 2014); generated from EA model
+V. 0.5.0	April 2015	RMM	Updated
+V. 0.6		February 2016 (RMM) Added Wrecks and Obstruction and update allowed spatial primitives to harmonize with the model and Feb. 2016 draft DCEG developed for NIPWG-2
+V. 0.7-20170331	March 2017 (Raphael Malyankar) Updated with meta and cartographic features; updated for revisions to the S-122 model up to March 2017; added nillability and
+		extensions schema
+V. 1.0.0-2017-0504	May 2017 Updated to harmonize with S-123 dated April 30
+V. 1.0.0-20170820 RC1	Aug 2017 Updates addressing NIPWG4 comments; Release Candidate 1
+V. 1.0.0-20170831	For V. 1.0.0
+================================================================================================== -->
+	<!-- To do: Schematron validation rules; full restrictions for numeric type attributes(?);
+-->
+	<!-- profile: xmlns:gml="http://www.iho.int/S-100/profile/s100_gmlProfile"
+        deployment:
+        (1) change gml namespace to official GML namespace http://www.opengis.net/gml/3.2
+        (2) add profile namespace xmlns:s100="http://www.iho.int/S-100/profile/s100_gmlProfile"
+        (3) update import statement below correspondingly
+-->
+	<xs:annotation>
+		<xs:documentation>Application schema for IHO SNPWG MPA sample dataset</xs:documentation>
+	</xs:annotation>
+	<xs:import namespace="http://www.iho.int/s100gml/1.0" schemaLocation="s100gmlbase.xsd"/>
+	<xs:import namespace="http://www.opengis.net/gml/3.2" schemaLocation="S100_gmlProfile.xsd"/>
+	<xs:import namespace="http://www.iho.int/S-100/profile/s100_gmlProfile" schemaLocation="S100_gmlProfileLevels.xsd"/>
+	<xs:import namespace="http://www.iho.int/s100gml/1.0+EXT" schemaLocation="s100gmlbaseExt.xsd"/>
+	<!-- =============================================== -->
+	<!-- common types - consider defining a common
+        "chameleon" schema for all NPUBS specifications? -->
+	<!-- =============================================== -->
+	<xs:complexType name="S100_TruncatedDate">
+		<xs:annotation>
+			<xs:documentation>built in date types from W3C XML schema, implementing S-100 truncated date</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element name="gDay" type="xs:gDay"/>
+			<xs:element name="gMonth" type="xs:gMonth"/>
+			<xs:element name="gYear" type="xs:gYear"/>
+			<xs:element name="gMonthDay" type="xs:gMonthDay"/>
+			<xs:element name="gYearMonth" type="xs:gYearMonth"/>
+			<xs:element name="date" type="xs:date"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:simpleType name="ISO639-3">
+		<xs:annotation>
+			<xs:documentation>stub for ISO 639-3 language codes</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\w{3}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ISO639-2">
+		<xs:annotation>
+			<xs:documentation>stub for ISO 639-2 language codes</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\w{3}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ISO3166-alpha2">
+		<xs:annotation>
+			<xs:documentation>stub for ISO 3166 alpha2 country codes</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\w{2}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Decimal0.0To360.0">
+		<xs:annotation>
+			<xs:documentation>Type for value interval [0.0, 360.0]. Also limits value to 1 decimal place.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:fractionDigits value="1"/>
+			<xs:minInclusive value="0.0"/>
+			<xs:maxInclusive value="360.0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="NonNegativeDecimal">
+		<xs:annotation>
+			<xs:documentation>Type for decimal values with minimum 0.0.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:minInclusive value="0.0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="NonNegativeDecimal.1">
+		<xs:annotation>
+			<xs:documentation>Type for decimal values with minimum 0.0 and at most 1 decimal place</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="NonNegativeDecimal">
+			<xs:fractionDigits value="1"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="multiplicityOfLightsType">
+		<xs:annotation>
+			<xs:documentation>The number of lights of identical character that exist as a co-located group. Integer (minimum 2).</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:positiveInteger">
+			<xs:minInclusive value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- =============================================== -->
+	<!-- spatial property convenience types    -->
+	<!-- =============================================== -->
+	<xs:complexType name="PointOrSurface">
+		<xs:choice>
+			<xs:element ref="S100:pointProperty"/>
+			<xs:element ref="S100:surfaceProperty"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="CurveOrSurface">
+		<xs:choice>
+			<xs:element ref="S100:curveProperty"/>
+			<xs:element ref="S100:surfaceProperty"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="PointCurveSurface">
+		<xs:choice>
+			<xs:element ref="S100:pointProperty"/>
+			<xs:element ref="S100:curveProperty"/>
+			<xs:element ref="S100:surfaceProperty"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="PointOrCurve">
+		<xs:choice>
+			<xs:element ref="S100:curveProperty"/>
+			<xs:element ref="S100:surfaceProperty"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="GM_Point">
+		<xs:choice>
+			<xs:element ref="S100:pointProperty"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="GM_Curve">
+		<xs:choice>
+			<xs:element ref="S100:curveProperty"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="GM_Surface">
+		<xs:choice>
+			<xs:element ref="S100:surfaceProperty"/>
+		</xs:choice>
+	</xs:complexType>
+	<!-- ============================================================ -->
+	<!-- temporary type definitions pending model revisions by TSMAD  -->
+	<!-- ============================================================ -->
+	<!--<xs:complexType name="informationType_s101">
+		<xs:annotation>
+			<xs:appinfo>?</xs:appinfo>
+			<xs:documentation>Textual information about an object and the language in which it is written</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="text" type="xs:string">
+				<xs:annotation>
+					<xs:appinfo/>
+					<xs:documentation/>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="language" type="ISO639-3" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>-->
+	<!--<xs:complexType name="textualDescriptionType_s101">
+		<xs:annotation>
+			<xs:appinfo>?</xs:appinfo>
+			<xs:documentation/>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="fileReference" type="xs:string">
+				<xs:annotation>
+					<xs:appinfo/>
+					<xs:documentation>The name of a text file where more information can be found and the language in which it is written</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="language" type="ISO639-3" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>-->
+	<!-- ============================================================ -->
+	<!-- complex attributes, feature, and information types           -->
+	<!-- ============================================================ -->
+	<xs:complexType name="onlineResourceType">
+		<xs:annotation>
+			<xs:documentation>Information about online sources from which a resource or data can be obtained (ISO 19115, adapted).</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="linkage" type="xs:anyURI" nillable="true" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>location (address) for on-line access using a URL/URI address or similar addressing scheme. (Adapted from ISO 19115:2014.)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="protocol" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>connection protocol to be used. Example: ftp, http get KVP, http POST, etc. (ISO 19115)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="applicationProfile" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>name of an application profile that can be used with the online resource (ISO 19115)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="nameOfResource" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>name of the online resource (ISO 19115, adapted)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="onlineDescription" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>detailed text description of what the online resource is/does (ISO 19115)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="onlineFunction" type="onlineFunctionType" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>code for function performed by the online resource (ISO 19115)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="protocolRequest" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Request used to access the resource. Structure and content depend on the protocol and standard used by the online resource, such as Web Feature Service standard. (ISO 19115, adapted)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="graphicType">
+		<xs:sequence>
+			<xs:element name="pictorialRepresentation" type="xs:string" nillable="true" minOccurs="1" maxOccurs="unbounded"/>
+			<xs:element name="pictureCaption" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Short description of the purpose of the image.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="sourceDate" type="xs:date" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="pictureInformation" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>A set of information to provide credits to picture creator, copyright owner etc.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="bearingInformation" type="bearingInformationType" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AbstractRXNType" abstract="true">
+		<xs:annotation>
+			<xs:documentation>An abstract superclass for information types that encode rules, recommendations, and general information in text or graphic form.</xs:documentation>
+			<xs:documentation>Remarks: Subtypes of AbstractRxN carry the same attributes, but differ in the nature of information they encode. There are currently four such subtypes: Regulations, Restrictions, Recommendations, and NauticalInformation.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="InformationTypeType">
+				<xs:sequence>
+					<xs:element name="categoryOfAuthority" type="categoryOfAuthorityType" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="textContent" type="textContentType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="graphic" type="graphicType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="rxnCode" type="rxnCodeType" minOccurs="0" maxOccurs="unbounded"/>
+					<!--<xs:element name="appliesInLocation" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded"><xs:annotation><xs:documentation>optional</xs:documentation></xs:annotation></xs:element>-->
+					<xs:element name="isApplicableTo" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="theOrganisation" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="Applicability" type="ApplicabilityType" substitutionGroup="InformationType"/>
+	<xs:complexType name="ApplicabilityType">
+		<xs:annotation>
+			<xs:documentation>Describes the relationship between vessel characteristics and: (i) the applicability of an associated information object or feature to the vessel; or, (ii) the use of a facility, place, or service by the vessel; or, (iii) passage of the vessel through an area. </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="InformationTypeType">
+				<xs:sequence>
+					<xs:element name="ballast" type="xs:boolean" minOccurs="0" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>True: Vessel is predominantly empty of cargo and stabilised with the use of ballast water
+False: Vessel is carrying cargo and is not ballasted.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="categoryOfCargo" type="categoryOfCargoType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="categoryOfDangerousOrHazardousCargo" type="categoryOfDangerousOrHazardousCargoType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="categoryOfVessel" type="categoryOfVesselType" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="categoryOfVesselRegistry" type="categoryOfVesselRegistryType" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="logicalConnectives" type="logicalConnectivesType" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="thicknessOfIceCapability" type="xs:nonNegativeInteger" minOccurs="0" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>The thickness of ice that the ship can safely transit</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="information" type="informationType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="vesselPerformance" type="xs:string" minOccurs="0" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>A description of the required handling characteristics of a vessel including hull design, main and auxilliary machinery, cargo handling equipment, navigation equipment and manoeuvring behaviour. </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="vesselsMeasurements" type="vesselsMeasurementsType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="vslLocation" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Association to the Association class PermissionType</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="theApplicableRxN" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>To InclusionType</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="theShipReport" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="Authority" type="AuthorityType" substitutionGroup="InformationType"/>
+	<xs:complexType name="AuthorityType">
+		<xs:annotation>
+			<xs:documentation>A person or organisation having political or administrative power and control. (Oxford Dictionary of English) </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="InformationTypeType">
+				<xs:sequence>
+					<xs:element name="categoryOfAuthority" type="categoryOfAuthorityType" nillable="true" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="textContent" type="textContentType" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="theContactDetails" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="theServiceHours" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="theShipReport" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="theInformation" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="FeatureType" type="FeatureType" abstract="true" substitutionGroup="gml:AbstractFeature"/>
+	<xs:complexType name="FeatureType" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Generalized feature type which carry all the common attributes</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="S100:AbstractFeatureType">
+				<xs:sequence>
+					<xs:element name="fixedDateRange" type="fixedDateRangeType" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="periodicDateRange" type="periodicDateRangeType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="featureName" type="featureNameType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="sourceIndication" type="sourceIndicationType" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="textContent" type="textContentType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="permission" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="providesInformation" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="theRxN" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="positions" type="gml:ReferenceType" minOccurs="0" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>A pointer to a specific cartographically positioned location for text.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="InformationType" type="InformationTypeType" abstract="true"/>
+	<xs:complexType name="InformationTypeType" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Generalized information type which carry all the common attributes</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="S100:AbstractInformationType">
+				<xs:sequence>
+					<xs:element name="fixedDateRange" type="fixedDateRangeType" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="periodicDateRange" type="periodicDateRangeType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="featureName" type="featureNameType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="sourceIndication" type="sourceIndicationType" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="providesInformation" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="MarineProtectedArea" type="MarineProtectedAreaType" substitutionGroup="FeatureType"/>
+	<xs:complexType name="MarineProtectedAreaType">
+		<xs:annotation>
+			<xs:documentation>Any area of the intertidal or sub tidal terrain, together with its overlying water and associated flora, fauna, historical and cultural features, which has been reserved by law or other effective means to protect part or all of the enclosed environment. (IUCN – The World Conservation Union. 1998. Resolution 17.38 of the 17th General Assembly of the IUCN. Gland, Switzerland and Cambridge, UK.) </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="FeatureType">
+				<xs:sequence>
+					<xs:element name="categoryOfMarineProtectedArea" type="categoryOfMarineProtectedAreaType" nillable="true" minOccurs="1" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>(International Union for Conservation of Nature and Natural Resources) </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="categoryOfRestrictedArea" type="categoryOfRestrictedAreaType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="jurisdiction" type="jurisdictionType" nillable="true" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="restriction" type="restrictionType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="status" type="statusType" minOccurs="0" maxOccurs="unbounded"/>
+					<!--<xs:element name="graphic" type="graphicType" minOccurs="0" maxOccurs="unbounded"/>-->
+					<xs:element name="responsibleAuthority" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="geometry" type="CurveOrSurface" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="VesselTrafficServiceArea" type="VesselTrafficServiceAreaType" substitutionGroup="FeatureType"/>
+	<xs:complexType name="VesselTrafficServiceAreaType">
+		<xs:annotation>
+			<xs:documentation>The area of any service implemented by a relevant authority primarily designed to improve safety and efficiency of traffic flow and the protection of the environment. It may range from simple information messages, to extensive organisation of the traffic involving national or regional schemes.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="FeatureType">
+				<xs:sequence>
+					<xs:element name="categoryOfVesselTrafficService" type="categoryOfVesselTrafficServiceType" nillable="true" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="reptForTrafficServ" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="controlAuthority" type="gml:ReferenceType" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="geometry" type="GM_Surface" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="NauticalInformation" type="NauticalInformationType" substitutionGroup="InformationType"/>
+	<xs:complexType name="NauticalInformationType">
+		<xs:annotation>
+			<xs:documentation>Nautical information about a related area or facility. 
+Constraint: If Regulations.textContent is populated, there cannot be textualDescription or information attributes directly bound to the Regulations.. A similar constraint applies to the information types Recommendations, Restrictions, and NauticalInformation.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="AbstractRXNType">
+				<xs:sequence>
+					<xs:element name="informationProvidedFor" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>This tag is overloaded, but the relationship cannot be to a feature type because info->feature links are not allowed by the 3.0.0 feature catalogue</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="NonStandardWorkingDay" type="NonStandardWorkingDayType" substitutionGroup="InformationType"/>
+	<xs:complexType name="NonStandardWorkingDayType">
+		<xs:annotation>
+			<xs:documentation>Days when many services are not available. Often days of festivity or recreation when normal working hours are limited, esp. a national or religious festival, etc. </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="InformationTypeType">
+				<xs:sequence>
+					<xs:element name="fixedDate" type="S100_TruncatedDate" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>The date when a festival or national holiday recurs on the same day each year in the Gregorian calendar. </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="variableDate" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>A day which is not fixed in the Gregorian calendar.
+Examples: The fourth Thursday in November; new moon day of Kartika (Diwali); Easter Sunday. </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="information" type="informationType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="theServiceHours_nsdy" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>optional</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--<xs:element name="Obstruction" type="ObstructionType" substitutionGroup="FeatureType"/>-->
+	<!--<xs:complexType name="ObstructionType">
+		<xs:annotation>
+			<xs:documentation>In Marine navigation, anything that hinders or prevents movement, particularly anything that endangers or prevents passage of a vessel. The term is usually used to refer to an isolated danger to navigation, such as a sunken rock or pinnacle.
+				S-122: S-122 uses only Obstruction features with categoryOfObstruction=5 (fish haven) or 14 (artificial reef). Attributes in S-122 may be a subset of the S-101 attributes. Also, S-122 datasets may not populate all the optional attributes polulated in S-101.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="FeatureType">
+				<xs:sequence>
+					<xs:element name="categoryOfObstruction" type="categoryOfObstructionType" minOccurs="1" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>Only values 5, 14 allowed in S-122. Unlike S-101, categoryOfObstruction is mandatory in S-122.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="condition" type="conditionType" minOccurs="0" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>Only values 1, 2, 5 allowed in S-122.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="expositionOfSounding" type="expositionOfSoundingType" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="height" type="xs:string" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="maximumPermittedDraught" type="xs:string" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="qualityOfSoundingMeasurement" type="QUASOU" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="reportedDate" type="xs:string" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="status" type="statusType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="techniqueOfVerticalMeasurement" type="TECSOU" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="valueOfSounding" type="xs:string" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="verticalLength" type="xs:string" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="verticalUncertainty" type="xs:string" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="waterLevelEffect" type="waterLevelEffectType" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="geometry" type="PointCurveSurface" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>-->
+	<xs:element name="PermissionType" type="PermissionType" substitutionGroup="InformationType"/>
+	<xs:complexType name="PermissionType">
+		<xs:annotation>
+			<xs:documentation>Association class for associations describing whether the subsets of vessels determined by the ship characteristics specified in APPLIC may (or must, etc.) transit,  enter, or use  a feature.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="InformationTypeType">
+				<xs:sequence>
+					<xs:element name="categoryOfRelationship" type="categoryOfRelationshipType" nillable="true" minOccurs="1" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>This attribute expresses the level of insistence for or against an action or activity by a vessel of the subset described by the APPLIC object at one end in relation to the feature at the other end of the association.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<!--<xs:element name="vslLocation" type="gml:ReferenceType" minOccurs="1" maxOccurs="unbounded"/>-->
+					<xs:element name="permission" type="gml:ReferenceType" minOccurs="1" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Reference Applicability</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="InclusionType" type="InclusionType" substitutionGroup="InformationType"/>
+	<xs:complexType name="InclusionType">
+		<xs:annotation>
+			<xs:documentation>Association class specifying the relationship between the subset of vessels described by an APPLIC data object and a regulation (restriction, recommendation, or nautical information).</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="InformationTypeType">
+				<xs:sequence>
+					<xs:element name="membership" type="membershipType" nillable="true" minOccurs="1" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>indicates whether a vessel is included or excluded from the regulation/restriction/recommendation/nautical information</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="theApplicableRxN" type="gml:ReferenceType" minOccurs="1" maxOccurs="unbounded"/>
+					<xs:element name="isApplicableTo" type="gml:ReferenceType" minOccurs="1" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="Recommendations" type="RecommendationsType" substitutionGroup="InformationType"/>
+	<xs:complexType name="RecommendationsType">
+		<xs:annotation>
+			<xs:documentation>Recommendations for a related area or facility. 
+Constraint: If Regulations.textContent is populated, there cannot be textualDescription or information attributes directly bound to the Regulations.. A similar constraint applies to the information types Recommendations, Restrictions, and NauticalInformation.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="AbstractRXNType">
+				<xs:sequence/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="Regulations" type="RegulationsType" substitutionGroup="InformationType"/>
+	<xs:complexType name="RegulationsType">
+		<xs:annotation>
+			<xs:documentation>Regulations for a related area or facility.
+Constraint: If Regulations.textContent is populated, there cannot be textualDescription or information attributes directly bound to the Regulations.. A similar constraint applies to the information types Recommendations, Restrictions, and NauticalInformation.
+ </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="AbstractRXNType">
+				<xs:sequence/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="RestrictedAreaNavigational" type="RestrictedAreaNavigationalType" substitutionGroup="FeatureType"/>
+	<xs:complexType name="RestrictedAreaNavigationalType">
+		<xs:annotation>
+			<xs:documentation>A specified area of land or water designated by an appropriate authority within which access or navigation is restricted in accordance with certain specified conditions.
+				A navigational restricted area is an area where the restrictions have a direct impact on the navigation of a vessel in the area.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="FeatureType">
+				<xs:sequence>
+					<xs:element name="categoryOfRestrictedArea" type="categoryOfRestrictedAreaType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="restriction" type="restrictionType" nillable="true" minOccurs="1" maxOccurs="unbounded"/>
+					<xs:element name="status" type="statusType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="geometry" type="GM_Surface" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="RestrictedAreaRegulatory" type="RestrictedAreaRegulatoryType" substitutionGroup="FeatureType"/>
+	<xs:complexType name="RestrictedAreaRegulatoryType">
+		<xs:annotation>
+			<xs:documentation>A specified area of land or water designated by an appropriate authority within which access or navigation is restricted in accordance with certain specified conditions.
+			A regulatory restricted area is an area where the restrictions have no direct impact on the navigation of a vessel in the area, but impact on the activities that can take place within the area.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="FeatureType">
+				<xs:sequence>
+					<xs:element name="categoryOfRestrictedArea" type="categoryOfRestrictedAreaType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="restriction" type="restrictionType" nillable="true" minOccurs="1" maxOccurs="unbounded"/>
+					<xs:element name="status" type="statusType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="geometry" type="GM_Surface" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="Restrictions" type="RestrictionsType" substitutionGroup="InformationType"/>
+	<xs:complexType name="RestrictionsType">
+		<xs:annotation>
+			<xs:documentation>Restrictions for a related area or facility. 
+Constraint: If Regulations.textContent is populated, there cannot be textualDescription or information attributes directly bound to the Regulations.. A similar constraint applies to the information types Recommendations, Restrictions, and NauticalInformation.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="AbstractRXNType">
+				<xs:sequence/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="ServiceHours" type="ServiceHoursType" substitutionGroup="InformationType"/>
+	<xs:complexType name="ServiceHoursType">
+		<xs:annotation>
+			<xs:documentation>The time when a service is available and known exceptions. </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="InformationTypeType">
+				<xs:sequence>
+					<xs:element name="scheduleByDoW" type="scheduleByDoWType" nillable="true" minOccurs="1" maxOccurs="unbounded"/>
+					<xs:element name="information" type="informationType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="theAuthority_srvHrs" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>optional</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="partialWorkingDay" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="ShipReport" type="ShipReportType" substitutionGroup="InformationType"/>
+	<xs:complexType name="ShipReportType">
+		<xs:annotation>
+			<xs:documentation>This describes how a ship should report to a maritime authority, including when to report, what to report and whether the format conforms to the IMO standard. </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="InformationTypeType">
+				<xs:sequence>
+					<xs:element name="categoryOfShipReport" type="categoryOfShipReportType" nillable="true" minOccurs="1" maxOccurs="unbounded"/>
+					<xs:element name="imoFormatForReporting" type="xs:boolean" nillable="true" minOccurs="1" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>Whether a report must be in an IMO standard format</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="reportTo" type="gml:ReferenceType" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="noticeTime" type="noticeTimeType" nillable="true" minOccurs="1" maxOccurs="unbounded"/>
+					<xs:element name="textContent" type="textContentType" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="mustBeFiledBy" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+					<!--<xs:element name="reptForLocation" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded"><xs:annotation><xs:documentation>optional</xs:documentation></xs:annotation></xs:element>-->
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:simpleType name="categoryOfCargoType">
+		<xs:annotation>
+			<xs:documentation>Remarks:
+If item 7 is used, the nature of dangerous or hazardous cargoes can be amplified with category of dangerous or hazardous cargo. </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="bulk">
+				<xs:annotation>
+					<xs:documentation>Normally dry cargo which is transported to and from the vessel on conveyors or grabs </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="container">
+				<xs:annotation>
+					<xs:documentation>One of a number of standard sized cargo carrying units, secured using standard corner attachments and bars </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="general">
+				<xs:annotation>
+					<xs:documentation>Break bulk cargo normally loaded by crane </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="liquid">
+				<xs:annotation>
+					<xs:documentation>Any cargo loaded by pipeline</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="passenger">
+				<xs:annotation>
+					<xs:documentation>A fee paying traveller </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="livestock">
+				<xs:annotation>
+					<xs:documentation>Live animals carried in bulk </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="dangerous or hazardous">
+				<xs:annotation>
+					<xs:documentation>Dangerous or hazardous cargo as described by the IMO International Maritime Dangerous Goods code </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="categoryOfVesselTrafficServiceType">
+		<xs:annotation>
+			<xs:documentation>Classification of vessel traffic services based on the nature of the control or services provided</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Information Service">
+				<xs:annotation>
+					<xs:documentation>A service to ensure that essential information becomes available in time for on-board navigational decision-making</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Traffic Organisation Service">
+				<xs:annotation>
+					<xs:documentation>A service to assist on-board navigational decision-making and to monitor its effects</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Navigational Assistance Service">
+				<xs:annotation>
+					<xs:documentation>A service to prevent the development of dangerous maritime traffic situations and to provide for the safe and efficient movement of vessel traffic within the VTS area</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Ship Reporting Service">
+				<xs:annotation>
+					<xs:documentation>A service established by a relevant authority consisting of one or more reporting points or lines at which ships are required to report their identity, course, speed and other data to the monitoring authority</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Local Port Service">
+				<xs:annotation>
+					<xs:documentation>A service established to provide port information without interaction between the customer and the service provider. This information could be inter alia berthing information, availability of port services, shipping schedules, meteorological and hydrological data.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="categoryOfRelationshipType">
+		<xs:annotation>
+			<xs:documentation>This attribute expresses the level of insistence for or against an action or activity</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="prohibited">
+				<xs:annotation>
+					<xs:documentation>use of facility, waterway or service is forbidden</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="not recommended">
+				<xs:annotation>
+					<xs:documentation>use of facility, waterway or service is not recommended</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="permitted">
+				<xs:annotation>
+					<xs:documentation>use of facility, waterway, or service is permitted but not required </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="recommended">
+				<xs:annotation>
+					<xs:documentation>use of facility, waterway, or service is recommended </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="required">
+				<xs:annotation>
+					<xs:documentation>use of facility, waterway, or service is required </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="not required">
+				<xs:annotation>
+					<xs:documentation>use of facility, waterway, or service is not required </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="vesselsCharacteristicsType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="length overall">
+				<xs:annotation>
+					<xs:documentation>The maximum length of the ship (L.O.A.). (http://en.wikipedia.org/wiki/Ship_measurements; 24 July 2010) </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="length at waterline">
+				<xs:annotation>
+					<xs:documentation>The ship's length measured at the waterline (L.W.L.). (http://en.wikipedia.org/wiki/Ship_measurements; 24 July 2010) </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="breadth">
+				<xs:annotation>
+					<xs:documentation>The width or beam of the vessel. (Adapted from http://en.wikipedia.org/wiki/Ship_measurements; 24 July 2010) </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="draught">
+				<xs:annotation>
+					<xs:documentation>The depth of water necessary to float a vessel fully loaded. (http://en.wikipedia.org/wiki/Ship_measurements; 24 July 2010) </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="height">
+				<xs:annotation>
+					<xs:documentation>The height of the highest point of a vessel's structure (e.g. radar aerial, funnel, cranes, masthead) above her waterline.
+(UKHO NP100/2009) </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="displacement tonnage">
+				<xs:annotation>
+					<xs:documentation>A measurement of the weight of the vessel, usually used for warships. (Merchant ships are usually measured based on the volume of cargo space; see tonnage). Displacement is expressed either in long tons of 2,240 pounds or metric tonnes of 1,000 kg. Since the two units are very close in size (2,240 pounds = 1,016 kg and 1,000 kg = 2,205 pounds), it is common not to distinguish between them. To preserve secrecy, nations sometimes misstate a warship's displacement. (http://en.wikipedia.org/wiki/Ship_measurements; 24 July 2010) </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="displacement tonnage, light">
+				<xs:annotation>
+					<xs:documentation>The weight of the ship excluding cargo, fuel, ballast, stores, passengers, and crew, but with water in the boilers to steaming level. (http://en.wikipedia.org/wiki/Ship_measurements; 24 July 2010) </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="displacement tonnage, loaded">
+				<xs:annotation>
+					<xs:documentation>The weight of the ship including cargo, passengers, fuel, water, stores, dunnage and such other items necessary for use on a voyage, which brings the vessel down to her load draft. (http://en.wikipedia.org/wiki/Ship_measurements; 24 July 2010) </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="deadweight tonnage">
+				<xs:annotation>
+					<xs:documentation>The difference between displacement, light and displacement, loaded. A measure of the ship's total carrying capacity. (http://en.wikipedia.org/wiki/Ship_measurements; 24 July 2010)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="gross tonnage">
+				<xs:annotation>
+					<xs:documentation>The entire internal cubic capacity of the ship expressed in tons of 100 cubic feet to the ton, except certain spaces with are exempted such as: peak and other tanks for water ballast, open forecastle bridge and poop, access of hatchways, certain light and air spaces, domes of skylights, condenser, anchor gear, steering gear, wheel house, galley and cabin for passengers. (http://en.wikipedia.org/wiki/Ship_measurements; 24 July 2010) </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="net tonnage">
+				<xs:annotation>
+					<xs:documentation>Obtained from the gross tonnage by deducting crew and navigating spaces and allowances for propulsion machinery.(http://en.wikipedia.org/wiki/Ship_measurements; 24 July 2010) </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Panama Canal/Universal Measurement System net tonnage">
+				<xs:annotation>
+					<xs:documentation>the Panama Canal/Universal Measurement System (PC/UMS) is based on net tonnage, modified for Panama Canal purposes. PC/UMS is based on a mathematical formula to calculate a vessel's total volume; a PC/UMS net ton is equivalent to 100 cubic feet of capacity.
+(Adapted from http://en.wikipedia.org/wiki/Tonnage 4 Oct 2010) </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Suez Canal net tonnage">
+				<xs:annotation>
+					<xs:documentation>the Suez Canal Net Tonnage (SCNT) is derived with a number of modifications from the former net register tonnage of the Moorsom System and was established by the International Commission of Constantinople in its Protocol of 18 December 1873. It is still in use, as amended by the Rules of Navigation of the Suez Canal Authority, and is registered in the Suez Canal Tonnage Certificate. (Adapted from http://en.wikipedia.org/wiki/Tonnage 4 Oct 2010) </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Suez Canal gross tonnage">
+				<xs:annotation>
+					<xs:documentation>Suez Canal Gross Tonnage (SCGT) is derived with a number of modifications from the former net register tonnage of the Moorsom System and was established by the International Commission of Constantinople in its Protocol of 18 December 1873. It is still in use, as amended by the Rules of Navigation of the Suez Canal Authority, and is registered in the Suez Canal Tonnage Certificate.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="categoryOfShipReportType">
+		<xs:annotation>
+			<xs:documentation>Classification of ship reports based on IMO standard report formats.</xs:documentation>
+			<xs:documentation>Remarks: Through Resolution A.851(20), the IMO encourages authorities to require standard formats and procedures for ship reporting specified at ID 1 to 7 above but recognises that some authorities require amended formats and these cases are covered by ID 8 "any other report". 
+(Appendix to IMO Resolution A.851(20) GENERAL PRINCIPLES FOR SHIP REPORTING SYSTEMS AND SHIP REPORTING REQUIREMENTS, INCLUDING GUIDELINES FOR REPORTING INCIDENTS INVOLVING DANGEROUS GOODS, HARMFUL SUBSTANCES AND/OR MARINE POLLUTANTS.)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="sailing plan">
+				<xs:annotation>
+					<xs:documentation>before or as near as possible to the time of departure from a port within a system or when entering the area covered by a system [for instance A, B, J, X etc] </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="position report">
+				<xs:annotation>
+					<xs:documentation>when necessary to ensure effective operation of the system </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="deviation report">
+				<xs:annotation>
+					<xs:documentation>when the ship’s position varies significantly from the position that would have been predicted from previous reports, when changing the reported route, or as decided by the master </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="final report">
+				<xs:annotation>
+					<xs:documentation>on arrival at the destination or on leaving the area covered by the system </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="dangerous goods report">
+				<xs:annotation>
+					<xs:documentation>when an incident takes place involving the loss or likely loss overboard of packaged dangerous goods, including those in freight containers, portable tanks, road and rail vehicles and shipborne barges, into the sea </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="harmful substances report">
+				<xs:annotation>
+					<xs:documentation>when an incident takes place involving the discharge or probable discharge of oil (Annex I of MARPOL 73/78) or noxious liquid substances in bulk (Annex II of MARPOL 73/78) </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="marine pollutants report">
+				<xs:annotation>
+					<xs:documentation>in the case of the loss or likely loss overboard of harmful substances in packaged form, including those in freight containers, portable tanks, road and rail vehicles and shipborne barges identified in the International Maritime Goods Code as marine pollutants (Annex III of MARPOL 73/78). </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="any other report">
+				<xs:annotation>
+					<xs:documentation>any other report should be made in accordance with the system procedures as notified in accordance with paragraph 9 of the general principles </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="categoryOfTextType">
+		<xs:annotation>
+			<xs:documentation>Classification of completeness of textual information in relation to the source.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="abstract or summary">
+				<xs:annotation>
+					<xs:documentation>A statement summarizing the important points of a text.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="extract">
+				<xs:annotation>
+					<xs:documentation>An excerpt or excerpts from a text.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="full text">
+				<xs:annotation>
+					<xs:documentation>The whole text</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--<xs:complexType name="categoryOfVessel">
+		<xs:annotation>
+			<xs:documentation>The role or type of vessel</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="general cargo vessel" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>a vessel designed to carry general cargo</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="container carrier" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>a vessel designed to carry ISO containers</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="tanker" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>a vessel designed to carry bulk liquid or gas, including LPG and LNG</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="bulk carrier" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>a vessel designed to carry bulk solid material</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="passenger vessel" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>a vessel designed to carry passengers; often a cruise ship</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="roll-on roll-off" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>a vessel designed to allow road vehicles to be driven on and off; often a ferry</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="refrigerated cargo vessel" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>a vessel designed to carry refrigerated cargo</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="fishing vessel" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>a vessel designed to catch or hunt fish</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="service" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>a vessel which provides a service such as a tug, anchor handler, survey or supply vessel</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="warship" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>a vessel designed for the conduct of military operations</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="towed or pushed composite unit" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>either a tug and tow, or any combination of a tug providing propulsion to barges or vessels secured ahead or alongside</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="tug and tow" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>a combination of tug(s) and non-powered tow(s)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>-->
+	<xs:simpleType name="comparisonOperatorType">
+		<xs:annotation>
+			<xs:documentation>Remarks: The definition of COMPOP provides the relation between the value given in the model and the real ship's value. </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="greater than">
+				<xs:annotation>
+					<xs:documentation>The value of the left value is greater than that of the right.(http://en.wikipedia.org/wiki/Logical_connective) </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="greater than or equal to">
+				<xs:annotation>
+					<xs:documentation>The value of the left expression is greater than or equal to that of the right. (http://en.wikipedia.org/wiki/Logical_connective) </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="less than">
+				<xs:annotation>
+					<xs:documentation>The value of the left expression is less than that of the right. (http://en.wikipedia.org/wiki/Logical_connective) </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="less than or equal to">
+				<xs:annotation>
+					<xs:documentation>The value of the left expression is less than or equal to that of the right. (http://en.wikipedia.org/wiki/Logical_connective) </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="equal to">
+				<xs:annotation>
+					<xs:documentation>The two values are equivalent. (adapted http://en.wikipedia.org/wiki/Logical_connective) </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="not equal to">
+				<xs:annotation>
+					<xs:documentation>The two values are not equivalent. (adapted http://en.wikipedia.org/wiki/Logical_connective) </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="dayOfWeekType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="monday">
+				<xs:annotation>
+					<xs:documentation>monday
+the day of the week before Tuesday and following Sunday </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="tuesday">
+				<xs:annotation>
+					<xs:documentation>the day of the week before Wednesday and following Monday </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="wednesday">
+				<xs:annotation>
+					<xs:documentation>wednesday
+the day of the week before Thursday and following Tuesday </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="thursday">
+				<xs:annotation>
+					<xs:documentation>thursday
+the day of the week before Friday and following Wednesday </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="friday">
+				<xs:annotation>
+					<xs:documentation>friday
+the day of the week before Saturday and following Thursday </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="saturday">
+				<xs:annotation>
+					<xs:documentation>saturday
+the day of the week before Sunday and following Friday (together with Sunday forming part of the weekend) </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="sunday">
+				<xs:annotation>
+					<xs:documentation>sunday
+the day of the week before Monday and following Saturday (together with Saturday forms part of the weekend) </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="operationType">
+		<xs:annotation>
+			<xs:documentation>Indicates whether the minimum or maximum value should be used to describe a condition or in application processing</xs:documentation>
+			<xs:documentation>Remarks: OPERAT is intended to be used in conjunction with other attributes (or sub-attributes of a complex attribute) to indicate how their values must be combined in order to describe a condition. Null attributes are ignored.
+Example: Complex attribute underkeelAllowance with UKCFIX=2.5, UKCVAR=10.00, OPERAT=1 inicates that the under-keel allowance required is the greater of 2.5 metres or 10% of the ship's draught.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="largest value">
+				<xs:annotation>
+					<xs:documentation>The numerically largest value computed from the applicable attributes or sub-attributes</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="smallest value">
+				<xs:annotation>
+					<xs:documentation>The numerically smallest value computed from the applicable attributes or sub-attributes</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="featureNameType">
+		<xs:annotation>
+			<xs:documentation>The complex attribute provides the name of an entity, defines the national language of the name, and provides the option to display the name at various system display settings.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="displayName" type="xs:boolean" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>A statement expressing if a feature name is to be displayed in certain display settings or not.
+Indication: Boolean. A True value is an indication that the name is intended to be displayed.
+Remarks:
+Where it is allowable to encode multiple instances of feature name for a single feature instance, only one feature name instance can indicate that the name is to be displayed (display name set to True).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="language" type="ISO639-3" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>The method of human communication, either spoken or written, consisting of the use of words in a structured and conventional way</xs:documentation>
+					<xs:documentation>Remarks: The language is encoded by a character code following ISO 639-3</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="name" type="xs:string" nillable="true" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>The individual name of a feature.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="fixedDateRangeType">
+		<xs:annotation>
+			<xs:documentation>Describes a single fixed period, as the date range between its sub-attributes.
+Remarks: Sub-attributes date end and date start must have the calendar year encoded using 4 digits for the calendar year (CCYY). Month (MM) and day (DD) are optional.
+(This definition merges the planned S-100 temporal model with the current S-101 DCEG definition of fixed date range.)</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="dateStart" type="S100_TruncatedDate" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>The start date or time of the interval.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="dateEnd" type="S100_TruncatedDate" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>The end date or time of the interval.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="frequencyPairType">
+		<xs:annotation>
+			<xs:documentation>A pair of frequencies for transmitting and receiving radio signals. The shore station transmits and receives on the frequencies indicated</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="contactInstructions" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="categoryOfCommPref" type="categoryOfCommPrefType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="frequencyShoreStationTransmits" type="xs:positiveInteger" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>The shore station transmitter frequency expressed in kHz to one decimal place. Units: kHZ, Resolution: 0.1, Format: XXXXXX
+Examples: 4379.1 kHz becomes 043791; 13162.8 kHz becomes 131628</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="frequencyShoreStationReceives" type="xs:positiveInteger" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>The shore station receiver frequency expressed in kHz to one decimal place. Units: kHz, Resolution: 0.1, Format: XXXXXX
+Examples: 4379.1 kHz becomes 043791; 13162.8 kHz becomes 131628 </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="textContent" type="textContentType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="scheduleByDoWType">
+		<xs:annotation>
+			<xs:documentation>Describes the nature and timings of a daily schedule by days of the week.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="categoryOfSchedule" type="categoryOfScheduleType" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Describes the type of schedule, e.g., opening, closure, etc.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="tmIntervalsByDoW" type="tmIntervalsByDoW" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="tmIntervalsByDoW">
+		<xs:annotation>
+			<xs:documentation>Time intervals by days of the week.</xs:documentation>
+			<xs:documentation>Remarks:
+				The sub-attribute dayOfWeekIsRanges indicates whether an instance of this attribute encodes a range of days or discrete days. The days or day-range(s) are encoded in sub-attribute dayOfWeek. Multiple ranges are allowed but mixing range with discrete days(s) is not allowed (encode another instance of this attribute instead).
+				An indeterminate range may be indicated with a null value at the appropriate position in the sequence.
+				Examples:
+				- To code the range “Monday through Friday” use the sequence: dayOfWeek=1, dayOfWeek=5 and set dayOfWeekIsRanges=TRUE.    
+				- To encode the days Monday, Wednesday, Friday, use the sequence dayOfWeek=1, dayOfWeek=3, dayOfWeek=5 and set dayOfWeekIsRanges=FALSE.    
+				- The sequence dayOfWeek=1, dayOfWeek=3, dayOfWeek=5  to indicate Mon-Wed and Thursday is not allowed. Encode the Mon-Wed and Thursday schedules in different instances of this complex attribute.    
+				Product specifications may need to allow this attribute to be repeated in order to allow encoding of schedules which vary for different days of the week.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="dayOfWeek" type="dayOfWeekType" minOccurs="0" maxOccurs="7">
+				<xs:annotation>
+					<xs:documentation>Encodes either range(s) of days or discrete days. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="dayOfWeekIsRanges" type="xs:boolean" nillable="true" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Indicates whether the values in dayOfWeek indicate a range of days (true) or discrete days (false).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="timeReference" type="timeReferenceType" nillable="true" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Indicates whether the time co-attributes are encoded in UTC or local time (LT).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="timeOfDayStart" type="xs:time" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Starting time of day, possibly for a period within the day.
+						Distinction: Time start (TIMSTA) (S-101) which has a format YYYYMMDDThhmmss (mandatory) in the baseline S-101 DCEG as of October 2015.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="timeOfDayEnd" type="xs:time" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Ending time of day, possibly for a period within the day.
+						Distinction: Time end (TIMEND) (S-101) which has a format YYYYMMDDThhmmss (mandatory) in the baseline S-101 DCEG as of October 2015.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="jurisdictionType">
+		<xs:annotation>
+			<xs:documentation>The jurisdiction applicable to an administrative area.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="international">
+				<xs:annotation>
+					<xs:documentation>involving more than one country; covering more than one national area.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="national">
+				<xs:annotation>
+					<xs:documentation>an area administered or controlled by a single nation.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="national sub-division">
+				<xs:annotation>
+					<xs:documentation>an area smaller than the nation in which it lies.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="logicalConnectivesType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="logical conjunction">
+				<xs:annotation>
+					<xs:documentation>all the conditions described by the other attributes of the object, or sub-attributes of the same complex attribute, are true </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="logical disjunction ">
+				<xs:annotation>
+					<xs:documentation>at least one of the conditions described by the other attributes of the object, or sub-attributes of the same complex attributes, is true </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="membershipType">
+		<xs:annotation>
+			<xs:documentation>Definition required</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="included">
+				<xs:annotation>
+					<xs:documentation>Vessels with these characteristics are included in the regulation/restriction/recommendation/nautical information.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="excluded">
+				<xs:annotation>
+					<xs:documentation>Vessels with these characteristics are excluded from the regulation/restriction/recommendation/nautical information.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="noticeTimeType">
+		<xs:sequence>
+			<xs:element name="noticeTimeHours" type="xs:decimal" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>The time duration prior to the time the service is needed, when notice must be provided to the service provider.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="noticeTimeText" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Text string qualifying the notice time specified in NTCHRS. This may explain the time specification in NTCHRS (e.g., “3 working days” for a NTCHRS value of “72” where NTCTIM is supposed to be "3 working days") or consist of other language qualifying the time, e.g., “On departure from last port” or “On passing reporting line XY”).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="operation" type="operationType" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="periodicDateRangeType">
+		<xs:annotation>
+			<xs:documentation>This complex attribute describes the active period for a seasonal feature or information type. </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="dateStart" type="S100_TruncatedDate" nillable="true" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>The start date or time of the interval.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="dateEnd" type="S100_TruncatedDate" nillable="true" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>The end date or time of the interval.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="radiocommunicationsType">
+		<xs:annotation>
+			<xs:documentation>Detailed radiocommunications description with channels, frequencies, preferences and time schedules</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="categoryOfCommPref" type="categoryOfCommPrefType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="communicationChannel" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="contactInstructions" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>supplemental instructions on how or when to contact the individual, organisation, or service</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="frequencyPair" type="frequencyPairType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="tmIntervalsByDoW" type="tmIntervalsByDoW" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="rxnCodeType">
+		<xs:annotation>
+			<xs:documentation>A summary of the impact of the most common types of regulation, restriction, recommendation and nautical information on a vessel.</xs:documentation>
+			<xs:documentation>Remark: This attribute converts the subject, topic, and effects of regulations, etc., from plain text or natural language into a set of categories.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="categoryOfRxN" type="categoryOfRxNType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="actionOrActivity" type="actionOrActivityType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="headline" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Words set at the head of a passage or page to introduce or categorize</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="sourceIndicationType">
+		<xs:annotation>
+			<xs:documentation>Content of featureName is source authority name</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="categoryOfAuthority" type="categoryOfAuthorityType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="country" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="featureName" type="featureNameType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="reportedDate" type="S100_TruncatedDate" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="source" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>The publication, document, or reference work from which information comes or is acquired.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="sourceType" type="sourceTypeType" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Type of source</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="sourceTypeType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="law or regulation">
+				<xs:annotation>
+					<xs:documentation>treaty, convention, or international agreement; law or regulation issued by a national or other authority</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="official publication">
+				<xs:annotation>
+					<xs:documentation>publication not having the force of law, issued by an international organisation or a national or local administration</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="mariner report, confirmed">
+				<xs:annotation>
+					<xs:documentation>Reported by mariner(s) and confirmed by another source</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="mariner report, not confirmed">
+				<xs:annotation>
+					<xs:documentation>reported by mariner(s) but not confirmed</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="industry publications and reports">
+				<xs:annotation>
+					<xs:documentation>shipping and other industry publication, including graphics, charts and web sites</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="remotely sensed images">
+				<xs:annotation>
+					<xs:documentation>information obtained from satellite images</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="photographs">
+				<xs:annotation>
+					<xs:documentation>information obtained from photographs</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="products issued by HO services">
+				<xs:annotation>
+					<xs:documentation>information obtained from products issued by Hydropgrahic Offices</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="news media">
+				<xs:annotation>
+					<xs:documentation>information obtained from news media</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="traffic data">
+				<xs:annotation>
+					<xs:documentation>information obtained from the analysis of traffic data</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="vesselsCharacteristicsUnitType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="metre">
+				<xs:annotation>
+					<xs:documentation>The metre (or meter) is the base unit of length in the International System of Units (SI). It is defined as the distance travelled by light in vacuum in 1/299,792,458 of a second. </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="foot">
+				<xs:annotation>
+					<xs:documentation>A foot (plural: feet) is a non-SI unit of length in a number of different systems including English units, Imperial units, and United States customary units. The most commonly used foot today is the international foot. There are three feet in a yard and 12 inches in a foot. </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="metric ton">
+				<xs:annotation>
+					<xs:documentation>The tonne or metric ton (U.S.), often redundantly referred to as a metric tonne, is a unit of mass equal to 1,000 kg (2,205 lb) or approximately the mass of one cubic metre of water at four degrees Celsius. It is sometimes abbreviated as mt in the United States, but this conflicts with other SI symbols. The tonne is not a unit in the International System of Units (SI), but is accepted for use with the SI. In SI units and prefixes, the tonne is a megagram (Mg). The Imperial and US customary units comparable to the tonne are both spelled ton in English, though they differ in mass. Pronunciation of tonne (the word used in the UK) and ton is usually identical, but is not too confusing unless accuracy is important as the tonne and UK long ton differ by only 1.6%.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ton">
+				<xs:annotation>
+					<xs:documentation>Long ton (weight ton or imperial ton) is the name for the unit called the "ton" in the avoirdupois or Imperial system of measurements, as used in the United Kingdom and several other Commonwealth countries. It has been mostly replaced by the tonne, and in the United States by the short ton. One long ton is equal to 2,240 pounds (1,016 kg) or 35 cubic feet (0.9911 m3) of salt water with a density of 64 lb/ft³ (1.025 g/ml). It has some limited use in the United States, most commonly in measuring the displacement of ships, and was the unit prescribed for warships by the Washington Naval Treaty—for example battleships were limited to a mass of 35,000 long tons (36,000 t; 39,000 ST). </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="short ton">
+				<xs:annotation>
+					<xs:documentation>The short ton is a unit of weight equal to 2,000 pounds (907.18474 kg). In the United States it is often called simply ton without distinguishing it from the metric ton (tonne, 1,000 kilograms) or the long ton (2,240 pounds / 1,016.0469088 kilograms); rather, the other two are specifically noted. There are, however, some U.S. applications for which unspecified tons normally means long tons (for example, Navy ships) or metric tons (world grain production figures).
+Both the long and short ton are defined as 20 hundredweights, but a hundredweight is 100 pounds (45.359237 kg) in the U.S. system (short or net hundredweight) and 112 pounds (50.80234544 kg) in the Imperial system (long or gross hundredweight).</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="gross ton">
+				<xs:annotation>
+					<xs:documentation>Gross tonnage (GT) is a function of the volume of all ship's enclosed spaces (from keel to funnel) measured to the outside of the hull framing. There is a sliding scale factor. So GT is a kind of capacity-derived index that is used to rank a ship for purposes of determining manning, safety and other statutory requirements and is expressed simply as GT, which is a unitless entity, even though its derivation is tied to the cubic meter unit of volumetric capacity.
+Tonnage measurements are now governed by an IMO Convention (International Convention on Tonnage Measurement of Ships, 1969 (London-Rules)), which applies to all ships built after July 1982. In accordance with the Convention, the correct term to use now is GT, which is a function of the moulded volume of all enclosed spaces of the ship. </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="net ton">
+				<xs:annotation>
+					<xs:documentation>Net tonnage (NT) is based on a calculation of the volume of all cargo spaces of the ship. It indicates a vessel’s earning space and is a function of the moulded volume of all cargo spaces of the ship.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Panama Canal/Universal Measurement System net tonnage">
+				<xs:annotation>
+					<xs:documentation>The Panama Canal/Universal Measurement System (PC/UMS) is based on net tonnage, modified for Panama Canal purposes. PC/UMS is based on a mathematical formula to calculate a vessel's total volume; a PC/UMS net ton is equivalent to 100 cubic feet of capacity.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Suez Canal Net Tonnage">
+				<xs:annotation>
+					<xs:documentation>The Suez Canal Net Tonnage (SCNT) is derived with a number of modifications from the former net register tonnage of the Moorsom System and was established by the International Commission of Constantinople in its Protocol of 18 December 1873. It is still in use, as amended by the Rules of Navigation of the Suez Canal Authority, and is registered in the Suez Canal Tonnage Certificate.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="none">
+				<xs:annotation>
+					<xs:documentation>Can be used for net and gross tonnages, including Panama Canal/Universal Measurement System net tonnage and The Suez Canal Net Tonnage.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="cubic metres">
+				<xs:annotation>
+					<xs:documentation>cubic metres</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Suez Canal Gross Tonnage">
+				<xs:annotation>
+					<xs:documentation>The Suez Canal Gross Tonnage (SCGT) is derived with a number of modifications from the former net register tonnage of the Moorsom System and was established by the International Commission of Constantinople in its Protocol of 18 December 1873. It is still in use, as amended by the Rules of Navigation of the Suez Canal Authority, and is registered in the Suez Canal Tonnage Certificate.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="timeReferenceType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="UTC">
+				<xs:annotation>
+					<xs:documentation>Coordinated Universal Time</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LT">
+				<xs:annotation>
+					<xs:documentation>Local time </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="vesselsMeasurementsType">
+		<xs:sequence>
+			<xs:element name="comparisonOperator" type="comparisonOperatorType" nillable="true" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="vesselsCharacteristics" type="vesselsCharacteristicsType" nillable="true" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="vesselsCharacteristicsValue" type="xs:string" nillable="true" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="vesselsCharacteristicsUnit" type="vesselsCharacteristicsUnitType" nillable="true" minOccurs="1" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="categoryOfCommPrefType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="preferred calling">
+				<xs:annotation>
+					<xs:documentation>the first choice channel or frequency to be used when calling a radio station</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="alternate calling">
+				<xs:annotation>
+					<xs:documentation>a channel or frequency to be used for calling a radio station when the preferred channel or frequency is busy or is suffering from interference</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="preferred working">
+				<xs:annotation>
+					<xs:documentation>the first choice channel or frequency to be used when working with a radio station</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="alternate working">
+				<xs:annotation>
+					<xs:documentation>a channel or frequency to be used for working with a radio station when the preferred working channel or frequency is busy or is suffering from interference</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="ContactDetails" type="ContactDetailsType" substitutionGroup="InformationType"/>
+	<xs:complexType name="ContactDetailsType">
+		<xs:annotation>
+			<xs:documentation>Information on how to reach a person or organisation by postal, internet, telephone, telex and radio systems. </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="InformationTypeType">
+				<xs:sequence>
+					<xs:element name="callName" type="xs:string" minOccurs="0" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>The designated call name of a station, e.g. radio station, radar station, pilot.</xs:documentation>
+							<xs:documentation>Remarks: This is the name used when calling a radio station by radio i.e. "Singapore Pilots".</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="callSign" type="xs:string" minOccurs="0" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>The designated call-sign of a radio station.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="categoryOfCommPref" type="categoryOfCommPrefType" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="communicationChannel" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>A channel number assigned to a specific radio frequency, frequencies or frequency band.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="contactAddress" type="contactAddressType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="contactInstructions" type="xs:string" minOccurs="0" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>supplemental instructions on how or when to contact the individual, organisation, or service</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="frequencyPair" type="frequencyPairType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="information" type="informationType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="mMSICode" type="xs:nonNegativeInteger" minOccurs="0" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>The Maritime Mobile Service Identity (MMSI) Code is formed of a series of nine digits which are transmitted over the radio path in order to uniquely identify ship stations, ship earth stations, coast stations, coast earth stations, and group calls. These identities are formed in such a way that the identity or part thereof can be used by telephone and telex subscribers connected to the general telecommunications network principally to call ships automatically. </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="onlineResource" type="onlineResourceType" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Information about online sources from which a resource or data can be obtained (ISO 19115, adapted)</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="telecommunications" type="telecommunicationsType" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>information for contact by means of a telecommunications service.
+Distinctions: emailAddress, internetAddress, callName, callSign, COMCHA</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="radiocommunications" type="radiocommunicationsType" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>When bound to ContactDetails, only the listed sub-attributes may be used:
+								- communicationChannel
+								- contactinstructions
+								- frequencypair
+								- categoryOfChannelOrFrequencyPreference
+								- tmIntervalsByDoW</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="theAuthority" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="contactAddressType">
+		<xs:annotation>
+			<xs:documentation>Direction or superscription of a letter, package, etc., specifying the name of the place to which it is directed, and optionally a contact person or organisation who should receive it. (Oxford English Dictionary, 2nd Ed., adapted).</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="deliveryPoint" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Details of where post can be delivered such as the apartment, name and/or number of a street, building or PO Box. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="cityName" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>The name of a town or city. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="administrativeDivision" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Administrative division is a generic term for an administrative region within a country at a level below that of the sovereign state. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="country" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>The name of a nation. (Adapted from The American Heritage Dictionaries) </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="postalCode" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Known in various countries as a postcode, or ZIP code, the postal code is a series of letters and/or digits that identifies each postal delivery area. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<!--<xs:complexType name="telcomService">
+		<xs:annotation>
+			<xs:documentation>methods to communicate between involved parties over a distance</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="voice" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>The transfer or exchange of information by using sounds that are being made by mouth and throat when speaking</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="facsimile" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>a system of transmitting and reproducing graphic matter (as printing or still pictures) by means of signals sent over telephone lines</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="sms" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Short Message Service, a form of text messaging communication on phones and mobile phones</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="data" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>facts or information used usually to calculate, analyze, or plan something</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="streamedData" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Streamed data is data that that is constantly received by and presented to an end-user while being delivered by a provider.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="telex" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>a system of communication in which messages are sent over long distances by using a telephone system and are printed by using a special machine (called a teletypewriter)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="telegraph" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>an apparatus, system, or process for communication at a distance by electric transmission over wire</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="email" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Messages and other data exchanged between individuals using computers in a network.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>-->
+	<xs:complexType name="telecommunicationsType">
+		<xs:annotation>
+			<xs:documentation>A means or channel of communication at a distance by electrical, electronic, or electromagnetic means such as telegraphy, telephony, or broadcasting</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="telecommunicationIdentifier" type="xs:string" nillable="true" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Identifier used for contact by means of a telecommunications service, such as a telephone number</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="telcomCarrier" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>The name of provider or type of carrier for  a telecommunications service</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="contactInstructions" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>instructions on how and when to contact an individual or organisation</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="telecommunicationService" type="telecommunicationServiceType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Type of telecommunications service</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="categoryOfCommPref" type="categoryOfCommPrefType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="scheduleByDoW" type="scheduleByDoWType" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!--<xs:complexType name="onlineFunction">
+		<xs:sequence>
+			<xs:element name="download" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>online instructions for transferring data from one storage device or system to another. (ISO 19115:2014)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="information" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>online information about the resource (ISO 19115:2014)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="offlineAccess" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>online instructions for requesting the resource from the provider (ISO 19115:2014)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="order" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>online order process for obtaining the resource (ISO 19115:2014).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="search" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>online search interface for seeking out information about the resource (ISO 19115:2014).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="completeMetadata" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>complete metadata provided (ISO 19115:2014).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="browseGraphic" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>browse graphic provided (ISO 19115:2014).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="upload" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>online resource upload capability provided (ISO 19115:2014).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="emailService" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>online email service provided (ISO 19115:2014)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="browsing" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>online browsing provided (ISO 19115:2014)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="fileAccess" type="xs:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>online file access provided (ISO 19115:2014).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>-->
+	<xs:simpleType name="categoryOfRestrictedAreaType">
+		<xs:annotation>
+			<xs:documentation>Definition required</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="nature reserve">
+				<xs:annotation>
+					<xs:documentation>A tract of land or water managed so as to preserve it's flora, fauna, physical features, etc.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="bird sanctuary">
+				<xs:annotation>
+					<xs:documentation>A place where birds are bred and protected.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="game reserve">
+				<xs:annotation>
+					<xs:documentation>A place where wild animals or birds hunted for sport or food are kept undisturbed for private use.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="seal sanctuary">
+				<xs:annotation>
+					<xs:documentation>A place where seals are protected.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="historic wreck area">
+				<xs:annotation>
+					<xs:documentation>An area around certain wrecks of historical importance to protect the wrecks from unauthorized interference by diving, salvage or deposition (including anchoring).</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="research area">
+				<xs:annotation>
+					<xs:documentation>an area where marine research takes place.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="fish sanctuary">
+				<xs:annotation>
+					<xs:documentation>A place where fish are protected.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ecological reserve">
+				<xs:annotation>
+					<xs:documentation>A tract of land or water managed so as to preserve the relation of plants and living creatures to each other and to their surroundings.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="environmentally sensitive sea area">
+				<xs:annotation>
+					<xs:documentation>A generic term which may be used to describe a wide range of areas, considered sensitive for a variety of environmental reasons.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="particularly sensitive sea area">
+				<xs:annotation>
+					<xs:documentation>An area that needs special protection through action by IMO because of its significance for regional ecological, socio-economic or scientific reasons and because it may be vulnerable to damage by international shipping activities.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="coral sanctuary">
+				<xs:annotation>
+					<xs:documentation>A place where coral is protected. (TSMAD 29)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="recreation area">
+				<xs:annotation>
+					<xs:documentation>An area within which recreational activities regularly take place and therefore vessel movement may be restricted.
+						(Adapted from S-57 Edition 3.1, Appendix A – Chapter 2, Page 2.76, November 2000).</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="categoryOfScheduleType">
+		<xs:annotation>
+			<xs:documentation>Describes the type of schedule, e.g., opening, closure, etc.</xs:documentation>
+		</xs:annotation>
+		<xs:union>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="normal operation">
+						<xs:annotation>
+							<xs:documentation>The service, office, is open, fully manned, and operating normally, or the area is accessible as usual.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="closure">
+						<xs:annotation>
+							<xs:documentation>The service, office, or area is closed.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="unmanned operation">
+						<xs:annotation>
+							<xs:documentation>The service is available but not manned.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:pattern value="other: [a-zA-Z0-9]+( [a-zA-Z0-9]+)*"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:complexType name="informationType">
+		<xs:annotation>
+			<xs:documentation>Provides textual information that cannot be provided using other allowable attributes for the feature, in a defined language. The information may be provided as a string in sub-attribute text, or by encoding the file name of a single external text file that contains the text in sub-attribute file reference.</xs:documentation>
+			<xs:documentation>Remarks: - The sub-attribute text should be used, for example, to hold the information that is shown on paper charts by cautionary and explanatory notes. No formatting of text is possible within the sub-attribute text. If formatted text is required then an associated text file referenced by the sub-attribute file reference must be used; - The sub-attribute file reference is generally used for long text strings or those that require formatting, however there is no restriction on the type of text (except for lexical level) that can be held in files referenced by sub-attribute file reference.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="fileLocator" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>The string encodes the location of a fragment of text or other information in a support file.</xs:documentation>
+					<xs:documentation>Remarks: - Application schemas must describe how the associated file is identified. The associated file will commonly be named in a file reference co-attribute of the same complex attribute.; - Each DCEG must specify requirements for the format of the associated file and the semantics of file locator. For example, the value of file locator may be an HTML ID in an HTML file, line number in a text file) or a bookmark in a PDF file.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="fileReference" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>The string encodes the file name of a single external text file that contains the text.</xs:documentation>
+					<xs:documentation>Remarks: The attribute file reference is generally used for long text strings or those that require formatting, however there is no restriction on the type of text (except for lexical level) that can be held in files referenced by sub-attribute file reference.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="headline" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Words set at the head of a passage or page to introduce or categorize</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="language" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>ISO 639-3 value</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="text" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>A non-formatted digital text string.</xs:documentation>
+					<xs:documentation>Remarks: The attribute should be used, for example, to hold the information that is shown on paper charts by short cautionary and explanatory notes. Therefore text populated in text must not exceed 300 characters.
+Text may be in English or in a national language defined by the attribute language.
+No formatting of text is possible within the sub-attribute text. If formatted text, or text strings exceeding 300 characters, is required, then the attribute file reference must be used.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="textContentType">
+		<xs:annotation>
+			<xs:documentation>Remarks:
+	- Exactly one of sub-attributes onlineResource or information must be completed in one instance of textContent.
+	- Product specifications may restrict the use or content  of onlineResource for security. For example, a product specification may forbid populating onlineResource.
+	- Product specification authors must consider whether applications using the data product may be prevented from accessing off-system resources by security policies.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="categoryOfText" type="categoryOfTextType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="information" type="informationType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="onlineResource" type="onlineResourceType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="sourceIndication" type="sourceIndicationType" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="cardinalDirectionType">
+		<xs:annotation>
+			<xs:documentation>Principal and intermediate compass points.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="N">
+				<xs:annotation>
+					<xs:documentation>North</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NNE">
+				<xs:annotation>
+					<xs:documentation> Northnortheast</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NE">
+				<xs:annotation>
+					<xs:documentation>Northeast</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ENE">
+				<xs:annotation>
+					<xs:documentation>Eastnortheast</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="E">
+				<xs:annotation>
+					<xs:documentation>East</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ESE">
+				<xs:annotation>
+					<xs:documentation>Eastsoutheast</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="SE">
+				<xs:annotation>
+					<xs:documentation>Southeast</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="SSE">
+				<xs:annotation>
+					<xs:documentation>Southsoutheast</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="S">
+				<xs:annotation>
+					<xs:documentation>South</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="SSW">
+				<xs:annotation>
+					<xs:documentation>Southsouthwest</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="SW">
+				<xs:annotation>
+					<xs:documentation>Southwest</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WSW">
+				<xs:annotation>
+					<xs:documentation>Westsouthwest</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="W">
+				<xs:annotation>
+					<xs:documentation>West</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WNW">
+				<xs:annotation>
+					<xs:documentation>Westnorthwest</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NW">
+				<xs:annotation>
+					<xs:documentation>Northwest</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NNW">
+				<xs:annotation>
+					<xs:documentation>Northnorthwest</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="bearingInformationType">
+		<xs:annotation>
+			<xs:documentation>A bearing is the direction one object is from another object.
+At least one of the sub-attributes must be present.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="cardinalDirection" type="cardinalDirectionType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="distance" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="information" type="informationType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="orientation" type="orientationType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="sectorBearing" type="xs:decimal" minOccurs="0" maxOccurs="2"/>
+			<!--<xs:element name="sectorLimit" type="sectorLimitType" minOccurs="0" maxOccurs="1"/>-->
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="orientationType">
+		<xs:sequence>
+			<xs:element name="orientationUncertainty" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="orientationValue" type="xs:decimal" nillable="true" minOccurs="1" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="restrictionType">
+		<xs:annotation>
+			<xs:documentation>Definition required.
+Remarks: The official legal statue of each kind of restricted area defines the kind of restriction(s), e.g. the restriction for ' a game preserve' may be 'entry prohibited', the restriction for an 'anchoring prohibition' is 'anchoring prohibited'.
+The complete information about the restriction(s), actually held in handbooks or other publications, may be encoded by an associated instance of the information type Supplementary Information (see clause X.X) attribute textual description. A short explanation may be given by the use of the complex attribute information.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="anchoring prohibited">
+				<xs:annotation>
+					<xs:documentation>An area within which anchoring is not permitted.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="anchoring restricted">
+				<xs:annotation>
+					<xs:documentation>a specified area designated by appropriate authority, within which anchoring is restricted in accordance with certain specified conditions.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="fishing prohibited">
+				<xs:annotation>
+					<xs:documentation>An area within which fishing is not permitted.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="fishing restricted">
+				<xs:annotation>
+					<xs:documentation>a specified area designated by appropriate authority, within which fishing is restricted in accordance with certain specified conditions.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="trawling prohibited">
+				<xs:annotation>
+					<xs:documentation>An area within which trawling is not permitted.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="trawling restricted">
+				<xs:annotation>
+					<xs:documentation>a specified area designated by appropriate authority, within which trawling is restricted in accordance with certain specified conditions.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="entry prohibited">
+				<xs:annotation>
+					<xs:documentation>An area within which navigation and/or anchoring is prohibited.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="entry restricted">
+				<xs:annotation>
+					<xs:documentation>a specified area designated by appropriate authority, within which navigation is restricted in accordance with certain specified conditions.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="dredging prohibited">
+				<xs:annotation>
+					<xs:documentation>An area within which dredging is not permitted.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="dredging restricted">
+				<xs:annotation>
+					<xs:documentation>a specified area designated by appropriate authority, within which dredging is restricted in accordance with certain specified conditions.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="diving prohibited">
+				<xs:annotation>
+					<xs:documentation>An area within which diving is not permitted.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="diving restricted">
+				<xs:annotation>
+					<xs:documentation>a specified area designated by appropriate authority, within which diving is restricted in accordance with certain specified conditions.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="no wake">
+				<xs:annotation>
+					<xs:documentation>Mariners must adjust the speed of their vessels to reduce the wave or wash which may cause erosion or disturb moored vessels.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="area to be avoided">
+				<xs:annotation>
+					<xs:documentation>An IMO declared routeing measure comprising an area within defined limits in which either navigation is particularly hazardous or it is exceptionally important to avoid casualties and which should be avoided by all ships, or certain classes of ships.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="construction prohibited">
+				<xs:annotation>
+					<xs:documentation>The erection of permanent or temporary fixed structures or artificial islands is prohibited.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="discharging prohibited">
+				<xs:annotation>
+					<xs:documentation>An area in which discharging or dumping is prohibited.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="discharging restricted">
+				<xs:annotation>
+					<xs:documentation>A specified area designated by appropriate authority, within which discharging or dumping is restricted in accordance with certain specified conditions.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="industrial or mineral exploration/development prohibited">
+				<xs:annotation>
+					<xs:documentation>An area in which industrial or mineral exploration and development are prohibited.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="industrial or mineral exploration/development restricted">
+				<xs:annotation>
+					<xs:documentation>A specified area designated by appropriate authority, within which industrial or mineral exploration and development is restricted in accordance with certain specified conditions.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="drilling prohibited">
+				<xs:annotation>
+					<xs:documentation>An area in which excavating a hole on the seabed with a drill is prohibited.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="drilling restricted">
+				<xs:annotation>
+					<xs:documentation>A specified area designated by appropriate authority, within which excavating a hole on the seabed with a drill is restricted in accordance with certain specified conditions.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="removal of historical artifacts prohibited">
+				<xs:annotation>
+					<xs:documentation>An area in which the removal of historical artifacts is prohibited.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="cargo transhipment (lightering) prohibited">
+				<xs:annotation>
+					<xs:documentation>An area in which cargo transhipment (lightering) is prohibited.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="dragging prohibited">
+				<xs:annotation>
+					<xs:documentation>An area in which the dragging or anything along the seabed, e.g., bottom trawling, is prohibited.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="stopping prohibited">
+				<xs:annotation>
+					<xs:documentation>An area in which a vessel is prohibited from stopping.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="landing prohibited">
+				<xs:annotation>
+					<xs:documentation>An area in which landing is prohibited.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="speed restricted">
+				<xs:annotation>
+					<xs:documentation>An area in which speed is restricted.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="swimming prohibited">
+				<xs:annotation>
+					<xs:documentation>An area in which swimming is prohibited.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="statusType">
+		<xs:annotation>
+			<xs:documentation>Definition required</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="permanent">
+				<xs:annotation>
+					<xs:documentation>Intended to last or function indefinitely</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="occasional">
+				<xs:annotation>
+					<xs:documentation>Acting on special occasions; happening irregularly</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="recommended">
+				<xs:annotation>
+					<xs:documentation>Presented as worthy of confidence, acceptance, use, etc.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="not in use">
+				<xs:annotation>
+					<xs:documentation>Use has ceased, but the facility still exists intact; disused.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="periodic/intermittent">
+				<xs:annotation>
+					<xs:documentation>Recurring at intervals</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="reserved">
+				<xs:annotation>
+					<xs:documentation>Set apart for some specific use</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="temporary">
+				<xs:annotation>
+					<xs:documentation>Meant to last only for a time</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="private">
+				<xs:annotation>
+					<xs:documentation>Administered by an individual or corporation, rather than a State or a public body.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="mandatory">
+				<xs:annotation>
+					<xs:documentation>Compulsory; enforced.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="extinguished">
+				<xs:annotation>
+					<xs:documentation>No longer lit</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="illuminated">
+				<xs:annotation>
+					<xs:documentation>Lit by floodlights, strip lights, etc.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="historic">
+				<xs:annotation>
+					<xs:documentation>Famous in history; of historical interest</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="public">
+				<xs:annotation>
+					<xs:documentation>Belonging to, available to, used or shared by, the community as a whole and not restricted to private use.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="synchronised">
+				<xs:annotation>
+					<xs:documentation>Occur at a time, coincide in point of time, be contemporary or simultaneous</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="watched">
+				<xs:annotation>
+					<xs:documentation>Looked at or observed over a period of time especially so as to be aware of any movement or change.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="un-watched">
+				<xs:annotation>
+					<xs:documentation>Usually automatic in operation, without any permanently-stationed personnel to superintend it.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="existence doubtful">
+				<xs:annotation>
+					<xs:documentation>A feature that has been reported but has not been definitely determined to exist.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="buoyed">
+				<xs:annotation>
+					<xs:documentation>Marked by buoys</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="categoryOfDangerousOrHazardousCargoType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="IMDG Code Class 1 Div. 1.1">
+				<xs:annotation>
+					<xs:documentation>Explosives, Division 1: substances and articles which have a mass explosion hazard </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IMDG Code Class 1 Div. 1.2">
+				<xs:annotation>
+					<xs:documentation>Explosives, Division 2: substances and articles which have a projection hazard but not a mass explosion hazard </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IMDG Code Class 1 Div. 1.3">
+				<xs:annotation>
+					<xs:documentation>Explosives, Division 3: substances and articles which have a fire hazard and either a minor blast hazard or a minor projection hazard or both, but not a mass explosion hazard </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IMDG Code Class 1 Div. 1.4">
+				<xs:annotation>
+					<xs:documentation>Explosives, Division 4: substances and articles which present no significant hazard </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IMDG Code Class 1 Div. 1.5">
+				<xs:annotation>
+					<xs:documentation>Explosives, Division 5: very insensitive substances which have a mass explosion hazard </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IMDG Code Class 1 Div. 1.6">
+				<xs:annotation>
+					<xs:documentation>Explosives, Division 6: extremely insensitive articles which do not have a mass explosion hazard </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IMDG Code Class 2 Div. 2.1">
+				<xs:annotation>
+					<xs:documentation>Gases, flammable gases </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IMDG Code Class 2 Div. 2.2">
+				<xs:annotation>
+					<xs:documentation>Gases, non-flammable, non-toxic gases </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IMDG Code Class 2 Div. 2.3">
+				<xs:annotation>
+					<xs:documentation>Gases, toxic gases</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IMDG Code Class 3">
+				<xs:annotation>
+					<xs:documentation>flammable liquids </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IMDG Code Class 4 Div. 4.1">
+				<xs:annotation>
+					<xs:documentation>flammable solids, self-reactive substances and desensitized explosives </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IMDG Code Class 4 Div. 4.2">
+				<xs:annotation>
+					<xs:documentation>substances liable to spontaneous combustion </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IMDG Code Class 4 Div. 4.3">
+				<xs:annotation>
+					<xs:documentation>substances which, in contact with water, emit flammable gases </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IMDG Code Class 5 Div. 5.1">
+				<xs:annotation>
+					<xs:documentation>oxidizing substances </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IMDG Code Class 5 Div. 5.2">
+				<xs:annotation>
+					<xs:documentation>organic peroxides</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IMDG Code Class 6 Div. 6.1">
+				<xs:annotation>
+					<xs:documentation>toxic substances </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IMDG Code Class 6. Div. 6.2">
+				<xs:annotation>
+					<xs:documentation>infectious substances </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IMDG Code Class 7">
+				<xs:annotation>
+					<xs:documentation>Radioactive material </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IMDG Code Class 8">
+				<xs:annotation>
+					<xs:documentation>Corrosive substances </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IMDG Code Class 9">
+				<xs:annotation>
+					<xs:documentation>Miscellaneous dangerous substances and articles </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Harmful Substances in packaged form">
+				<xs:annotation>
+					<xs:documentation>Harmful substances are those substances which are identified as marine pollutants in the International Maritime Dangerous Goods Code (IMDG Code). Packaged form is defined as the forms of containment specified for harmful substances in the IMDG Code. (MARPOL (73/78) Annex III) </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="categoryOfAuthorityType">
+		<xs:annotation>
+			<xs:documentation>The type of person, government agency or organisation granted powers of managing or controlling access to and/or activity in an area</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="customs">
+				<xs:annotation>
+					<xs:documentation>The agency or establishment for collecting duties, tolls. (Merriam-Websters online Dictionary 23rd February 2006, amended).</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="border control">
+				<xs:annotation>
+					<xs:documentation>The administration to prevent or detect and prosecute violations of rules and regulations at international boundaries (adapted from Merriam-Websters online Dictionary 23rd February 2006).</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="police">
+				<xs:annotation>
+					<xs:documentation>The department of government, or civil force, charged with maintaining public order. (Adapted from OED)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="port">
+				<xs:annotation>
+					<xs:documentation>Person or corporation, owners of, or entrusted with or invested with the power of managing a port. May be called a Harbour Board, Port Trust, Port Commission, Harbour Commission, Marine Department (NP 100 8th Edition 14 Oct 2004)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="immigration">
+				<xs:annotation>
+					<xs:documentation>The authority controlling people entering a country.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="health">
+				<xs:annotation>
+					<xs:documentation>The authority with responsibility for checking the validity of the health declaration of a vessel and for declaring free pratique.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="coast guard">
+				<xs:annotation>
+					<xs:documentation>Organisation keeping watch on shipping and coastal waters according to governmental law; normally the authority with reponsibility for search and rescue.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="agricultural">
+				<xs:annotation>
+					<xs:documentation>The authority with responsibility for preventing infection of the agriculture of a country and for the protection of the agricultural interests of a country.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="military">
+				<xs:annotation>
+					<xs:documentation>A military authority which provides control of access to or approval for transit through designated areas or airspace.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="private company">
+				<xs:annotation>
+					<xs:documentation>A private or publicly owned company or commercial enterprise which exercises control of facilities, for example a callibration area.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="maritime police">
+				<xs:annotation>
+					<xs:documentation>A governmental or military force with jurisdiction in territorial waters. Examples could include Gendarmerie Maritime, Carabinierie, and Guardia Civil.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="environmental">
+				<xs:annotation>
+					<xs:documentation>An authority with responsibility for the protection of the environment.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="fishery">
+				<xs:annotation>
+					<xs:documentation>An authority with responsibility for the control of fisheries.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="finance">
+				<xs:annotation>
+					<xs:documentation>an authority with responsibility for the control and movement of money.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="maritime">
+				<xs:annotation>
+					<xs:documentation>A national or regional authority charged with administration of maritime affairs.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="categoryOfVesselRegistryType">
+		<xs:annotation>
+			<xs:documentation>The locality of vessel registration or enrolment relative to the nationality of a port, territorial sea, administrative area, exclusive zone or other location.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="domestic">
+				<xs:annotation>
+					<xs:documentation>The vessel is registered or enrolled under the same national flag as the port, harbour, territorial sea, exclusive economic zone, or administrative area in which the object that possesses this attribute applies or is located.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="foreign">
+				<xs:annotation>
+					<xs:documentation>The vessel is registered or enrolled under a national flag different from the port, harbour, territorial sea, exclusive economic zone, or other administrative area in which the object that possesses this attribute applies or is located.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--<xs:simpleType name="expositionOfSoundingType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="within the range of depth of the surrounding depth area"/>
+			<xs:enumeration value="shoaler than the range of depth of the surrounding depth area"/>
+			<xs:enumeration value="deeper than the range of depth of the surrounding depth area"/>
+		</xs:restriction>
+	</xs:simpleType>-->
+	<!--<xs:simpleType name="QUASOU">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="depth known"/>
+			<xs:enumeration value="doubtful sounding"/>
+			<xs:enumeration value="unreliable sounding"/>
+			<xs:enumeration value="value reported (not surveyed)"/>
+			<xs:enumeration value="value reported (not confirmed)"/>
+			<xs:enumeration value="depth or least depth unknown"/>
+			<xs:enumeration value="least depth known"/>
+			<xs:enumeration value="least depth unknown, safe clearance at value shown"/>
+		</xs:restriction>
+	</xs:simpleType>-->
+	<!-- ============================================= -->
+	<!-- codelists -->
+	<!-- ============================================= -->
+	<xs:simpleType name="categoryOfVesselType">
+		<xs:annotation>
+			<xs:documentation>Classification of vessels by function or use</xs:documentation>
+		</xs:annotation>
+		<xs:union>
+			<xs:annotation>
+				<xs:documentation>Codelist - open enumeration - S-100 Ed. 2.0.0.</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="general cargo vessel">
+						<xs:annotation>
+							<xs:documentation>a vessel designed to carry general cargo</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="container carrier">
+						<xs:annotation>
+							<xs:documentation>a vessel designed to carry ISO containers</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="tanker">
+						<xs:annotation>
+							<xs:documentation>a vessel designed to carry bulk liquid or gas, including LPG and LNG</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="bulk carrier">
+						<xs:annotation>
+							<xs:documentation>a vessel designed to carry bulk solid material</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="passenger vessel">
+						<xs:annotation>
+							<xs:documentation>a vessel designed to carry passengers; often a cruise ship</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="roll-on roll-off">
+						<xs:annotation>
+							<xs:documentation>a vessel designed to allow road vehicles to be driven on and off; often a ferry</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="refrigerated cargo vessel">
+						<xs:annotation>
+							<xs:documentation>a vessel designed to carry refrigerated cargo</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="fishing vessel">
+						<xs:annotation>
+							<xs:documentation>a vessel designed to catch or hunt fish</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="service">
+						<xs:annotation>
+							<xs:documentation>a vessel which provides a service such as a tug, anchor handler, survey or supply vessel</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="warship">
+						<xs:annotation>
+							<xs:documentation>a vessel designed for the conduct of military operations</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="towed or pushed composite unit">
+						<xs:annotation>
+							<xs:documentation>either a tug and tow, or any combination of a tug providing propulsion to barges or vessels secured ahead or alongside</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="tug and tow">
+						<xs:annotation>
+							<xs:documentation>a combination of tug(s) and non-powered tow(s)</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="light recreational">
+						<xs:annotation>
+							<xs:documentation>A pleasure boat or watercraft, or an excursion vessel used for short cruises such as whale watching</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="semi-submersible offshore installation">
+						<xs:annotation>
+							<xs:documentation>An installation which is designed to float at all times and which is normally anchored in position when deployed in the offshore gas and oil industry.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="jackup exploration or project installation">
+						<xs:annotation>
+							<xs:documentation>An exploration or project installation with legs which can be raised and lowered. The legs are raised when the installation is repositioned. When stationary the legs are lowered to the sea floor and the working platform is raised clear of the sea surface</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="livestock carrier">
+						<xs:annotation>
+							<xs:documentation>A vessel designed to carry large quantities of live animals.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="sport fishing">
+						<xs:annotation>
+							<xs:documentation>A vessel used in fishing for pleasure or competition.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:pattern value="other: [a-zA-Z0-9]+( [a-zA-Z0-9]+)*"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="onlineFunctionType">
+		<xs:annotation>
+			<xs:documentation>online search interface for seeking out information about the resource (ISO 19115:2014).</xs:documentation>
+		</xs:annotation>
+		<xs:union>
+			<xs:annotation>
+				<xs:documentation>Codelist - open enumeration - S-100 Ed. 2.0.0.</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="download">
+						<xs:annotation>
+							<xs:documentation>online instructions for transferring data from one storage device or system to another. (ISO 19115:2014)</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="information">
+						<xs:annotation>
+							<xs:documentation>online information about the resource (ISO 19115:2014)</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="offlineAccess">
+						<xs:annotation>
+							<xs:documentation>online instructions for requesting the resource from the provider (ISO 19115:2014)</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="order">
+						<xs:annotation>
+							<xs:documentation>online order process for obtaining the resource (ISO 19115:2014).</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="search">
+						<xs:annotation>
+							<xs:documentation>online search interface for seeking out information about the resource (ISO 19115:2014).</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="completeMetadata">
+						<xs:annotation>
+							<xs:documentation>complete metadata provided (ISO 19115:2014).</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="browseGraphic">
+						<xs:annotation>
+							<xs:documentation>browse graphic provided (ISO 19115:2014).</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="upload">
+						<xs:annotation>
+							<xs:documentation>online resource upload capability provided (ISO 19115:2014).</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="emailService">
+						<xs:annotation>
+							<xs:documentation>online email service provided (ISO 19115:2014)</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="browsing">
+						<xs:annotation>
+							<xs:documentation>online browsing provided (ISO 19115:2014)</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="fileAccess">
+						<xs:annotation>
+							<xs:documentation>online file access provided (ISO 19115:2014).</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:pattern value="other: [a-zA-Z0-9]+( [a-zA-Z0-9]+)*"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="telecommunicationServiceType">
+		<xs:annotation>
+			<xs:documentation>Classification of methods of communication over a distance by electrical or electromagnetic means.</xs:documentation>
+		</xs:annotation>
+		<xs:union>
+			<xs:annotation>
+				<xs:documentation>Codelist - open enumeration - S-100 Ed. 3.0.0.</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="voice">
+						<xs:annotation>
+							<xs:documentation>The transfer or exchange of information by using sounds that are being made by mouth and throat when speaking</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="facsimile">
+						<xs:annotation>
+							<xs:documentation>a system of transmitting and reproducing graphic matter (as printing or still pictures) by means of signals sent over telephone lines</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="sms">
+						<xs:annotation>
+							<xs:documentation>Short Message Service, a form of text messaging communication on phones and mobile phones</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="data">
+						<xs:annotation>
+							<xs:documentation>facts or information used usually to calculate, analyze, or plan something</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="streamedData">
+						<xs:annotation>
+							<xs:documentation>Streamed data is data that that is constantly received by and presented to an end-user while being delivered by a provider.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="telex">
+						<xs:annotation>
+							<xs:documentation>a system of communication in which messages are sent over long distances by using a telephone system and are printed by using a special machine (called a teletypewriter)</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="telegraph">
+						<xs:annotation>
+							<xs:documentation>an apparatus, system, or process for communication at a distance by electric transmission over wire</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="email">
+						<xs:annotation>
+							<xs:documentation>Messages and other data exchanged between individuals using computers in a network.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:pattern value="other: [a-zA-Z0-9]+( [a-zA-Z0-9]+)*"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="actionOrActivityType">
+		<xs:annotation>
+			<xs:documentation>The action or activity of a vessel</xs:documentation>
+		</xs:annotation>
+		<xs:union>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="navigating with a pilot">
+						<xs:annotation>
+							<xs:documentation>Carrying a qualified pilot as part of the vessel navigation team.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="entering port">
+						<xs:annotation>
+							<xs:documentation>navigating a vessel into a port</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="leaving port">
+						<xs:annotation>
+							<xs:documentation>Navigating a vessel out of a port.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="berthing">
+						<xs:annotation>
+							<xs:documentation>Attaching a vessel to a wharf or jetty.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="slipping">
+						<xs:annotation>
+							<xs:documentation>Detaching a vessel from a wharf or jetty.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="anchoring">
+						<xs:annotation>
+							<xs:documentation>Attaching a vessel to the seabed by means of an anchor and cable.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="weighing anchor">
+						<xs:annotation>
+							<xs:documentation>Detaching a vessel from the seabed by recovering an anchor and cable.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="transiting">
+						<xs:annotation>
+							<xs:documentation>Navigating a vessel along a route or through a narrow gap, such as under a bridge or through a lock.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="overtaking">
+						<xs:annotation>
+							<xs:documentation>Navigating a vessel past another traveling broadly in the same direction.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="reporting">
+						<xs:annotation>
+							<xs:documentation>Providing details such as the name, location or intentions of a vessel</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="working cargo">
+						<xs:annotation>
+							<xs:documentation>Loading or unloading cargo</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="landing">
+						<xs:annotation>
+							<xs:documentation>Placing crew or passengers on shore.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="diving">
+						<xs:annotation>
+							<xs:documentation>Placing a swimmer with an air supply below the sea surface.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="fishing">
+						<xs:annotation>
+							<xs:documentation>Hunting or catching fish.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="discharging overboard">
+						<xs:annotation>
+							<xs:documentation>Releasing anything into the sea; often ballast water; or spoil from dredging elsewhere.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="passing">
+						<xs:annotation>
+							<xs:documentation>Navigating a vessel past another traveling broadly in the opposite direction.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:pattern value="other: [a-zA-Z0-9]+( [a-zA-Z0-9]+)*"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="categoryOfRxNType">
+		<xs:annotation>
+			<xs:documentation>The principal subject matter of regulations, restrictions, recommendations or nautical information</xs:documentation>
+		</xs:annotation>
+		<xs:union>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="navigation">
+						<xs:annotation>
+							<xs:documentation>Pertaining to navigation</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="communication">
+						<xs:annotation>
+							<xs:documentation>Pertaining to communications</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="environmental protection">
+						<xs:annotation>
+							<xs:documentation>Pertaining to environmental protection </xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="wildlife protection">
+						<xs:annotation>
+							<xs:documentation>Pertaining to wildlife protection</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="security">
+						<xs:annotation>
+							<xs:documentation>Pertaining to security </xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="customs">
+						<xs:annotation>
+							<xs:documentation>Pertaining to customs</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="cargo operation">
+						<xs:annotation>
+							<xs:documentation>Pertaining to cargo operations</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="refuge">
+						<xs:annotation>
+							<xs:documentation>Pertaining to a place of safety or refuge</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="natural resources or exploitation">
+						<xs:annotation>
+							<xs:documentation>Pertaining to natural resources or exploitation</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="port">
+						<xs:annotation>
+							<xs:documentation>Pertaining to a port</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="finance">
+						<xs:annotation>
+							<xs:documentation>Pertaining to finance</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="agriculture">
+						<xs:annotation>
+							<xs:documentation>Pertaining to agriculture</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:pattern value="other: [a-zA-Z0-9]+( [a-zA-Z0-9]+)*"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="categoryOfMarineProtectedAreaType">
+		<xs:annotation>
+			<xs:documentation>Classification of marine protected areas based on IUCN (International Union for Conservation of Nature and Natural Resources) or another system</xs:documentation>
+		</xs:annotation>
+		<xs:union>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="IUCN Category Ia">
+						<xs:annotation>
+							<xs:documentation>Strict Nature Reserve: protected area managed mainly for science: Area of land and/or sea possessing some outstanding or representative ecosystems, geological or physiological features and/or species, available primarily for scientific research and/or environmental monitoring. (International Union for Conservation of Nature and Natural Resources publication “Guidelines for Protected Area Management Categories”, IUCN, 1994)</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="IUCN Category Ib">
+						<xs:annotation>
+							<xs:documentation>Wilderness Area: protected area managed mainly for wilderness protection: Large area of unmodified or slightly modified land, and/or sea retaining its natural character and influence, without permanent or significant habitation, which is protected and managed so as to preserve its natural condition. (International Union for Conservation of Nature and Natural Resources publication “Guidelines for Protected Area Management Categories”, IUCN, 1994)</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="IUCN Category II">
+						<xs:annotation>
+							<xs:documentation>National Park: protected area managed mainly for ecosystem protection and recreation: Natural area of land and/or sea, designated to (a) protect the ecological integrity of one or more ecosystems for present and future generations, (b) exclude exploitation or occupation inimical to the purposes of designation of the area and (c) provide a foundation for spiritual, scientific, educational, recreational and visitor opportunities, all of which must be environmentally and culturally compatible. (International Union for Conservation of Nature and Natural Resources publication “Guidelines for Protected Area Management Categories”, IUCN, 1994)</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="IUCN Category III">
+						<xs:annotation>
+							<xs:documentation>Natural Monument: protected area managed mainly for conservation of specific natural features: Area containing one, or more, specific natural or natural/cultural feature which is of outstanding or unique value because of its inherent rarity, representative or aesthetic qualities or cultural significance. (International Union for Conservation of Nature and Natural Resources publication “Guidelines for Protected Area Management Categories”, IUCN, 1994)</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="IUCN Category IV">
+						<xs:annotation>
+							<xs:documentation>Habitat/Species Management Area: protected area managed mainly for conservation through management intervention: Area of land and/or sea subject to active intervention for management purposes so as to ensure the maintenance of habitats and/or to meet the requirements of specific species. (International Union for Conservation of Nature and Natural Resources publication “Guidelines for Protected Area Management Categories”, IUCN, 1994) </xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="IUCN Category V">
+						<xs:annotation>
+							<xs:documentation>Protected Landscape/Seascape: protected area managed mainly for landscape/seascape conservation and recreation: Area of land, with coast and sea as appropriate, where the interaction of people and nature over time has produced an area of distinct character with significant aesthetic, ecological and/or cultural value, and often with high biological diversity. Safeguarding the integrity of this traditional interaction is vital to the protection, maintenance and evolution of such an area. (International Union for Conservation of Nature and Natural Resources publication “Guidelines for Protected Area Management Categories”, IUCN, 1994)</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="IUCN Category VI">
+						<xs:annotation>
+							<xs:documentation>Managed Resource Protected Area: protected area managed mainly for the sustainable use of natural ecosystems: Area containing predominantly unmodified natural systems, managed to ensure long term protection and maintenance of biological diversity, while providing at the same time a sustainable flow of natural products and services to meet community needs. (International Union for Conservation of Nature and Natural Resources publication “Guidelines for Protected Area Management Categories”, IUCN, 1994) </xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:pattern value="other: [a-zA-Z0-9]+( [a-zA-Z0-9]+)*"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<!-- ================================================= -->
+	<!-- substitution head for meta-features               -->
+	<!-- distinguished from ordinary features to allow     -->
+	<!-- meta-features to be distinguished from ordinary   -->
+	<!-- geo-features                                      -->
+	<!-- ================================================= -->
+	<xs:element name="MetaFeatureType" type="MetaFeatureType" abstract="true" substitutionGroup="gml:AbstractFeature"/>
+	<xs:complexType name="MetaFeatureType" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Generalized feature type which carry all the common attributes</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="S100:AbstractFeatureType"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<!-- ============================================= -->
+	<!-- types and elements for meta features		   -->
+	<!-- ============================================= -->
+	<xs:simpleType name="categoryOfTemporalVariationType">
+		<xs:annotation>
+			<xs:documentation>An assessment of the likelihood of change within an area since last survey.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="extreme event">
+				<xs:annotation>
+					<xs:documentation>NIPWG: No new hydrographic survey conducted after an event (e.g., hurricane, earthquake, volcanic eruption, landslide, etc.) which is considered likely to have resulted in significant change at the location.</xs:documentation>
+					<xs:documentation>In GI Registry: Definition: No new hydrographic survey conducted after an event (e.g. hurricane, earthquake, volcanic eruption, landslide, etc), which is considered likely to have changed the seafloor significantly.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="likely to change">
+				<xs:annotation>
+					<xs:documentation>NIPWG: Continuous or frequent change (e.g., river siltation, sand waves, seasonal storms, construction, etc.)
+						GI Registry:
+						Continuous or frequent change (e.g. river siltation, sand waves, seasonal storms, ice bergs, etc).</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="likely to change but significant shoaling not expected">
+				<xs:annotation>
+					<xs:documentation>GI Registry: Likely to change but significant shoaling no expected
+						[Proposed draft 6/27/2014: Recommended that SNPWG not use this enumerate - ref. E.M. email 6/27/2014.]</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="unlikely to change">
+				<xs:annotation>
+					<xs:documentation>NIPWG: Significant change at the location is not expected.
+						GI Registry: Significant change to the seafloor is not expected.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="unassessed">
+				<xs:annotation>
+					<xs:documentation>Temporal variation not assessed or cannot be determined</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="dataAssessmentType">
+		<xs:annotation>
+			<xs:documentation>The categorisation of the assessment level of bathymetric data for an area.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="assessed">
+				<xs:annotation>
+					<xs:documentation>The quality of the bathymetric data has been assessed.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="oceanic">
+				<xs:annotation>
+					<xs:documentation>The quality of oceanic bathymetric data has been assessed or is not required.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="unassessed">
+				<xs:annotation>
+					<xs:documentation>The quality of the bathymetric data has yet to be assessed.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="QUAPOSType">
+		<xs:annotation>
+			<xs:documentation>Definition required</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="surveyed">
+				<xs:annotation>
+					<xs:documentation>The position(s) was(were) determined by the operation of making measurements for determining the relative position of points on, above, or beneath the earth's surface. Survey implies a regular, controlled, survey of any date.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="unsurveyed">
+				<xs:annotation>
+					<xs:documentation>Survey data does not exist or is very poor</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="inadequately surveyed">
+				<xs:annotation>
+					<xs:documentation>Position data is of very poor quality</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="approximate">
+				<xs:annotation>
+					<xs:documentation>A position that is considered to be less than third-order accuracy, but is generally considered to be within 30.5 meters of its correct geographic location. Also, may apply to a feature whose position does not remain fixed.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="position doubtful">
+				<xs:annotation>
+					<xs:documentation>A feature whose position has been reported but which is considered to be doubtful</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="unreliable">
+				<xs:annotation>
+					<xs:documentation>A feature's position obtained from questionable or unreliable data.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="reported (not surveyed)">
+				<xs:annotation>
+					<xs:documentation>A feature whose position has been reported and its position confirmed by some means other than a formal survey such as an independent report of the same feature.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="reported (not confirmed">
+				<xs:annotation>
+					<xs:documentation>A feature whose position has been reported and its position has not been confirmed.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="estimated">
+				<xs:annotation>
+					<xs:documentation>The most probable position of a feature determined from incomplete data or data of questionable accuracy.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="precisely known">
+				<xs:annotation>
+					<xs:documentation>A position that is of a known value, such as the position of an anchor berth or other defined feature.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="calculated">
+				<xs:annotation>
+					<xs:documentation>A position that is computed from data.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="horizontalPositionalUncertainty">
+		<xs:annotation>
+			<xs:documentation>Definition required</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="uncertaintyFixed" type="xs:decimal" nillable="true" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>The best estimate of the fixed vertical accuracy component for depths, heights, vertical distances and vertical clearances</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="uncertaintyVariable" type="xs:decimal" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Definition required</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="surveyDateRangeType">
+		<xs:annotation>
+			<xs:documentation>The complex attribute describes the period of the hydrographic survey, as the time between its sub-attributes.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="dateStart" type="S100_TruncatedDate" nillable="true" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>The start date or time of the interval.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="dateEnd" type="S100_TruncatedDate" nillable="true" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>The end date or time of the interval.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="DataQuality" type="DataQualityType" abstract="true" substitutionGroup="MetaFeatureType"/>
+	<xs:complexType name="DataQualityType" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Abstract feature type for data quality meta-features</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="MetaFeatureType">
+				<xs:sequence>
+					<xs:element name="information" type="informationType" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Use of attribute information is discouraged for nautical publications data quality meta-features.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<!--<xs:element name="geometry" type="GM_OrientableSurface" minOccurs="1" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Permitted spatial primitives</xs:documentation>
+						</xs:annotation>
+					</xs:element>-->
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="QualityOfTemporalVariationType" type="QualityOfTemporalVariationType" abstract="true" substitutionGroup="MetaFeatureType"/>
+	<xs:complexType name="QualityOfTemporalVariationType" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Abstract type for meta-feature which can describe temporal variation.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="DataQualityType">
+				<xs:sequence>
+					<xs:element name="categoryOfTemporalVariation" type="categoryOfTemporalVariationType" nillable="true" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="dataAssessment" type="dataAssessmentType" nillable="true" minOccurs="1" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>The categorisation of the assessment level of bathymetric data for an area.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="DataCoverage" type="DataCoverageType" substitutionGroup="MetaFeatureType"/>
+	<xs:complexType name="DataCoverageType">
+		<xs:annotation>
+			<xs:documentation>A geographical area that describes the coverage and extent of spatial types.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="MetaFeatureType">
+				<xs:sequence>
+					<xs:element name="maximumDisplayScale" type="xs:positiveInteger" nillable="true" minOccurs="1" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>The largest intended viewing scale for the data. Not nillable(?)</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="minimumDisplayScale" type="xs:positiveInteger" nillable="true" minOccurs="1" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>The smallest intended viewing scale for the data. Not nillable(?)</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="geometry" type="S100EXT:SurfacePropertyType"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="QualityOfNonBathymetricData" type="QualityOfNonBathymetricDataType" substitutionGroup="MetaFeatureType"/>
+	<xs:complexType name="QualityOfNonBathymetricDataType">
+		<xs:annotation>
+			<xs:documentation>An area within which a uniform assessment of the quality of the non-bathymetric data exists. (Adapted from S-57 Edition 3.1, Appendix A – Chapter 1, Page 1.208, November 2000).</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="QualityOfTemporalVariationType">
+				<xs:sequence>
+					<xs:element name="horizontalDistanceUncertainty" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>The best estimate of the horizontal accuracy of horizontal clearances and distances.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="horizontalPositionalUncertainty" type="horizontalPositionalUncertainty" minOccurs="0" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>The best estimate of the accuracy of a position.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="directionUncertainty" type="xs:string" minOccurs="0" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>The best estimate of the accuracy of a bearing</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="sourceIndication" type="sourceIndicationType" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="surveyDateRange" type="surveyDateRangeType" minOccurs="0" maxOccurs="1"/>
+					<!--<xs:element name="geometry" type="GM_Surface" minOccurs="1" maxOccurs="unbounded"/>-->
+					<xs:element name="geometry" type="S100EXT:SurfacePropertyType" minOccurs="1" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="SpatialQuality" type="SpatialQuality"/>
+	<xs:complexType name="SpatialQuality">
+		<xs:complexContent>
+			<xs:extension base="InformationTypeType">
+				<xs:sequence>
+					<xs:element name="categoryOfTemporalVariation" type="categoryOfTemporalVariationType" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="horizontalPositionalUncertainty" type="horizontalPositionalUncertainty" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="qualityOfHorizontalMeasurement" type="QUAPOSType" minOccurs="0" maxOccurs="1"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="SpatialQualityPoints" type="SpatialQualityPoints"/>
+	<xs:complexType name="SpatialQualityPoints">
+		<xs:annotation>
+			<xs:documentation>Definition required</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="SpatialQuality">
+				<xs:sequence/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!-- ==================================================== -->
+	<!-- types and elements specific to cartographic features -->
+	<!-- ==================================================== -->
+	<xs:simpleType name="textJustificationType">
+		<xs:annotation>
+			<xs:documentation>The anchor point of a text string.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="left">
+				<xs:annotation>
+					<xs:documentation>The anchor point is at the start of the text string.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="centred">
+				<xs:annotation>
+					<xs:documentation>The anchor point is at the centre of the text string.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="right">
+				<xs:annotation>
+					<xs:documentation>The anchor point is at the end of the text string.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="TextPlacement" type="TextPlacement"/>
+	<xs:complexType name="TextPlacement">
+		<xs:annotation>
+			<xs:documentation>The Text Placement feature is used in association with the FeatureName attribute or a light description to optimise text positioning in ECDIS.</xs:documentation>
+			<xs:documentation>Remarks: - The Text Placement feature is used by the ECDIS to position the associated text, which has been populated using an attribute(s) for the related feature. This attribute is identified by populating the attribute text type. Alternatively, the text to be displayed may be encoded using the attribute text.
+				- Only one of the attributes text or text type are allowable for each instance of Text Placement.
+				- Text Placement should only be associated with features of type point, and used in areas where it is important that text clear navigationally relevant areas, e.g. shipping channels and dredged areas.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="flipBearing" type="xs:decimal" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>The bearing at which text is re-located to the opposite side of a feature when screen display is oriented away from true north.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="scaleMinimum" type="xs:integer" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="textJustification" type="textJustificationType" nillable="true" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>The anchor point of a text string.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="text" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>A non-formatted digital text string.</xs:documentation>
+					<xs:documentation>Remarks: The attribute should be used, for example, to hold the information that is shown on paper charts by short cautionary and explanatory notes. Therefore text populated in text must not exceed 300 characters.
+						Text may be in English or in a national language defined by the attribute language.
+						No formatting of text is possible within the sub-attribute text. If formatted text, or text strings exceeding 300 characters, is required, then the attribute file reference must be used.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="textType" type="textTypeType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="geometry" type="GM_Point" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="textTypeType">
+		<xs:annotation>
+			<xs:documentation>The attribute from which a text string is derived.
+				(S-122) Remark: S-122 does not include light features and therefore listed value '2: light characteristic' is omitted from the S-122 application schema.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Feature name">
+				<xs:annotation>
+					<xs:documentation>Definition required</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- ============================================= -->
+	<!-- types and elements for the dataset definition -->
+	<!-- ============================================= -->
+	<xs:complexType name="DatasetType">
+		<xs:annotation>
+			<xs:documentation>Dataset element for MPA dataset as "GML document"</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="gml:AbstractFeatureType">
+				<xs:sequence>
+					<xs:element name="DatasetIdentificationInformation" type="S100:DataSetIdentificationType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Dataset identification information</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="DatasetStructureInformation" type="S100:DataSetStructureInformationType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Dataset structure information</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:group ref="S100:Geometry" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Allows spatial objects to be located outside feature objects (for references, and compatibility with ISO 8211 encoding)</xs:documentation>
+						</xs:annotation>
+					</xs:group>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:element name="imember" type="IMemberType" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>intended for S100 information types. Extension of GML practice, not addressed by ISO 19136.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="member" type="MemberType" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>intended for technical GML 3.2 requirement for making the dataset a "GML document" and clause 21.3 of the OGC GML standard</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:choice>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!-- treatment of S-100 Information types is provisional, because GML does not have the concept, and they must be modeled as AbstractGML -->
+	<xs:complexType name="MemberType">
+		<xs:annotation>
+			<xs:documentation>dataset member</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="gml:AbstractFeatureMemberType">
+				<xs:sequence>
+					<xs:element ref="gml:AbstractFeature"/>
+				</xs:sequence>
+				<xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="IMemberType">
+		<xs:annotation>
+			<xs:documentation>dataset member S-100 infotmation types</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="gml:AbstractFeatureMemberType">
+				<xs:sequence>
+					<xs:element ref="InformationType"/>
+				</xs:sequence>
+				<xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="GenericFeatureType">
+		<xs:complexContent>
+			<xs:extension base="S100:AbstractFeatureType">
+				<xs:sequence>
+					<xs:any namespace="##local" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--<xs:element name="NewMPA" type="MarineProtectedAreaType"></xs:element>-->
+	<xs:element name="Dataset" type="DatasetType"/>
+</xs:schema>
