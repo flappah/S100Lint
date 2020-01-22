@@ -10,6 +10,14 @@ namespace S100Lint.Model.XReference
 {
     public class SchemaParser : S100LintBase, ISchemaParser
     {
+        /// <summary>
+        /// Parses the supplied XMLDocument's. It parses the source schema's in two lists. One for simpletypes
+        /// and one for complextypes. Both lists get sent to the Analyser method along with the targetschemas 
+        /// to compare with. 
+        /// </summary>
+        /// <param name="sourceSchemas"></param>
+        /// <param name="targetSchemas"></param>
+        /// <returns></returns>
         public virtual List<IReportItem> Parse(XmlDocument[] sourceSchemas, XmlDocument[] targetSchemas)
         {
             if (sourceSchemas is null)
@@ -47,7 +55,9 @@ namespace S100Lint.Model.XReference
         }
 
         /// <summary>
-        /// 
+        /// The analyser method compares the simple-and complex types with the supplied targetschemas. Any simpletype and/or
+        /// complextypes that shows differences against the targetschema(s) gets sent to the NodeAnalyser for in-depth
+        /// comparison. 
         /// </summary>
         /// <param name="sourceSimpleNodes"></param>
         /// <param name="sourceComplexNodes"></param>
