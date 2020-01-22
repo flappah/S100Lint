@@ -9,13 +9,6 @@ namespace S100Lint
     {
         static void Main(string[] args)
         {
-#if DEBUG
-            if (args.Length == 0)
-            {
-                args = new[] { "S123.XSD", "S127.XSD" };
-            }
-#endif 
-
             if (args.Length != 2)
             {
                 Console.WriteLine("Invalid syntax for S100Lint. Valid syntax is S100Lint [SchemaFileName] [FeatureCatalogueFileName]");
