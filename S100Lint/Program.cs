@@ -31,7 +31,7 @@ namespace S100Lint
                     reportItems = schemaParser.Validate(file1, file2);
                 }
 
-                Console.WriteLine("\nStatistics:");
+                Console.WriteLine("\General Information:");
                 foreach (var reportItem in reportItems)
                 {
                     if (reportItem.Type == Types.Enumerations.Type.Info)
