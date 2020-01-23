@@ -5,7 +5,6 @@ using S100Lint.Types;
 using S100Lint.Types.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Xml;
 
 namespace S100Lint.Model
