@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace S100Lint.Types
+﻿namespace S100Lint.Types
 {
     public class Enumerations
     {
         public enum Level
         {
+            Info = 1,
             Critical = 10,
             Error = 20,
             Warning = 30
@@ -21,6 +18,7 @@ namespace S100Lint.Types
 
         public enum Type
         {
+            Info = 1,
             SimpleType = 10,
             ComplexType = 20,
             Role = 30,

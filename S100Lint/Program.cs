@@ -11,13 +11,13 @@ namespace S100Lint
         {
             if (args.Length != 2)
             {
-                Console.WriteLine("Invalid syntax for S100Lint. Valid syntax is S100Lint [SchemaFileName] [FeatureCatalogueFileName]");
+                Console.WriteLine("Invalid syntax for S100Lint. Valid syntax is S100Lint [SchemaFileName] [SchemaFileName | FeatureCatalogueFileName]");
             }
             else 
             {
                 var file1 = args[0];
                 var file2 = args[1];
-                var reportItems = new List<IReportItem>();
+                List<IReportItem> reportItems;
                 var schemaParser = new SchemaAnalyser();
 
                 if (file2.ToLower().Contains(".xsd"))
@@ -31,17 +31,31 @@ namespace S100Lint
                     reportItems = schemaParser.Validate(file1, file2);
                 }
 
+                Console.WriteLine("\nStatistics:");
                 foreach (var reportItem in reportItems)
                 {
-                    if (reportItem.Chapter != 0)
+                    if (reportItem.Type == Types.Enumerations.Type.Info)
                     {
-                        Console.WriteLine();
-                        Console.WriteLine($"Chapter {reportItem.Chapter}");
-                        Console.WriteLine("-----------------------------");
+                        Console.WriteLine(reportItem.Message);
                     }
-                    else
+                }
+
+                Console.WriteLine("\nIssues:");
+                int issueNumber = 1;
+                foreach (var reportItem in reportItems)
+                {
+                    if (reportItem.Type != Types.Enumerations.Type.Info)
                     {
-                        Console.WriteLine($"{reportItem.TimeStamp.ToString("yyyy-MM-dd HH:mm:ss.ffff")}: {reportItem.Level} - {reportItem.Message}");
+                        if (reportItem.Chapter != 0)
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine($"Chapter {reportItem.Chapter}");
+                            Console.WriteLine("-----------------------------");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"({issueNumber++}) {reportItem.Level} - {reportItem.Message}");
+                        }
                     }
                 }
             }

@@ -1,8 +1,11 @@
 ﻿using S100Lint.Model.Interfaces;
 using S100Lint.Model.Validation;
 using S100Lint.Model.XReference;
+using S100Lint.Types;
 using S100Lint.Types.Interfaces;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml;
 
 namespace S100Lint.Model
@@ -19,7 +22,7 @@ namespace S100Lint.Model
         public virtual List<IReportItem> XReference(string schemaFileNameSource, string schemaFileNameTarget)
         {
             var xmlFileReader = new XmlFileReader();
-            var issues = new List<IReportItem>();
+            var items = new List<IReportItem>();
 
             var xmlSourceSchema = xmlFileReader.Read(schemaFileNameSource);
             var xmlTargetSchema = xmlFileReader.Read(schemaFileNameTarget);
@@ -74,10 +77,24 @@ namespace S100Lint.Model
                 }
 
                 var schemaParser = new SchemaParser();
-                issues.AddRange(schemaParser.Parse(xmlSourceSchemas.ToArray(), xmlTargetSchemas.ToArray()));
+                items.AddRange(schemaParser.Parse(xmlSourceSchemas.ToArray(), xmlTargetSchemas.ToArray()));
             }
 
-            return issues;
+            int issues =
+                items.FindAll(itm => itm.Level != Enumerations.Level.Info && itm.Chapter == 0).Count;
+
+            if (issues != 0)
+            {
+                items.Add(new ReportItem
+                {
+                    Level = Enumerations.Level.Info,
+                    Message = $"Cross referencing source- and target XMLSchema results in {issues} issue{(issues == 1 ? "" : "s")}",
+                    TimeStamp = DateTime.Now,
+                    Type = Enumerations.Type.Info
+                });
+            }
+
+            return items;
         }
 
 
@@ -90,7 +107,7 @@ namespace S100Lint.Model
         public virtual List<IReportItem> Validate(string schemaFilename, string catalogueFileName)
         {
             var xmlFileReader = new XmlFileReader();
-            var issues = new List<IReportItem>();
+            var items = new List<IReportItem>();
 
             var xmlSchema = xmlFileReader.Read(schemaFilename);
             List<XmlDocument> xmlSchemas = new List<XmlDocument>() { xmlSchema };
@@ -128,17 +145,44 @@ namespace S100Lint.Model
                     var simpleTypeNodes = xmlSchema.LastChild.SelectNodes(@"xs:simpleType", xsdNsmgr);
 
                     var simpleTypeParser = new SchemaSimpleNodeParser();
-                    issues.AddRange(simpleTypeParser.Parse(simpleTypeNodes, xmlSchemas.ToArray(), featureCatalogue));
+                    items.AddRange(simpleTypeParser.Parse(simpleTypeNodes, xmlSchemas.ToArray(), featureCatalogue));
 
                     // parse all complexTypes
                     var complexTypeNodes = xmlSchema.LastChild.SelectNodes(@"xs:complexType", xsdNsmgr);
 
                     var complexTypeParser = new SchemaComplexNodeParser();
-                    issues.AddRange(complexTypeParser.Parse(complexTypeNodes, xmlSchemas.ToArray(), featureCatalogue));
+                    items.AddRange(complexTypeParser.Parse(complexTypeNodes, xmlSchemas.ToArray(), featureCatalogue));
+
+                    // add statistics
+                    if (simpleTypeNodes.Count > 0 || complexTypeNodes.Count > 0)
+                    {
+                        items.Add(new ReportItem
+                        {
+                            Level = Enumerations.Level.Info,
+                            Message = $"Source XMLSchema contains {simpleTypeNodes.Count} SimpleNode{(simpleTypeNodes.Count == 1 ? "" : "s")} {(simpleTypeNodes.Count > 0 ? $"and {complexTypeNodes.Count} ComplexNode{(complexTypeNodes.Count == 1 ? "" : "s")}" : "")}",
+                            TimeStamp = DateTime.Now,
+                            Type = Enumerations.Type.Info
+                        });
+                    }
+
+                    int issues =
+                        items.FindAll(itm => itm.Level != Enumerations.Level.Info && itm.Chapter == 0).Count;
+
+                    if (issues != 0)
+                    {
+                        items.Add(new ReportItem
+                        {
+
+                            Level = Enumerations.Level.Info,
+                            Message = $"Validating the XMLSchema with the Feature Catalogue results in {issues} issue{(issues == 1 ? "" : "s")}",
+                            TimeStamp = DateTime.Now,
+                            Type = Enumerations.Type.Info
+                        });
+                    }
                 }
             }
 
-            return issues;
+            return items;
         }
     }
 }

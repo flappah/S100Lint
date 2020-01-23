@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
+using S100Lint.Types;
 
 namespace S100Lint.Model.XReference
 {
@@ -29,6 +30,7 @@ namespace S100Lint.Model.XReference
                 throw new ArgumentNullException(nameof(targetSchemas));
             }
 
+            var items = new List<IReportItem>();
             if (sourceSchemas.Length > 0 && targetSchemas.Length > 0)
             {
                 XmlNamespaceManager xsdNsmgr = new XmlNamespaceManager(sourceSchemas[0].NameTable);
@@ -47,10 +49,22 @@ namespace S100Lint.Model.XReference
                                                 select complexNode);
                 }
 
-                return Analyse(sourceSimpleNodes, sourceComplexNodes, targetSchemas, xsdNsmgr);
+                // add statistics
+                if (sourceSimpleNodes.Count > 0 || sourceComplexNodes.Count > 0)
+                {
+                    items.Add(new ReportItem
+                    {
+                        Level = Enumerations.Level.Info,
+                        Message = $"Source XMLSchema contains {sourceSimpleNodes.Count} SimpleNode{(sourceSimpleNodes.Count == 1 ? "" : "s")} {(sourceComplexNodes.Count > 0 ? $"and {sourceComplexNodes.Count} ComplexNode{(sourceComplexNodes.Count == 1 ? "" : "s")}" : "")}",
+                        TimeStamp = DateTime.Now,
+                        Type = Enumerations.Type.Info
+                    });
+                }
+
+                items.AddRange(Analyse(sourceSimpleNodes, sourceComplexNodes, targetSchemas, xsdNsmgr));
             }
 
-            return new List<IReportItem>();
+            return items;
         }
 
         /// <summary>
@@ -87,6 +101,9 @@ namespace S100Lint.Model.XReference
 
             var items = new List<IReportItem>();
 
+            int matchingSimpleNodes = 0;
+            int matchingComplexNodes = 0;
+
             if (sourceSimpleNodes.Count > 0 && targetSchemas.Length > 0)
             {
                 foreach (XmlNode sourceSimpleNode in sourceSimpleNodes)
@@ -97,6 +114,7 @@ namespace S100Lint.Model.XReference
                         var targetSimpleNode = SelectSingleNode(targetSchemas, $@"xs:simpleType[@name='{nameAttribute.InnerText}']", namespaceManager);
                         if (targetSimpleNode != null && targetSimpleNode.ChildNodes.Count > 0)
                         {
+                            matchingSimpleNodes++;
                             if (targetSimpleNode.InnerXml != sourceSimpleNode.InnerXml)
                             {
                                 var nodeAnalyser = new NodeAnalyser();
@@ -117,6 +135,7 @@ namespace S100Lint.Model.XReference
                         var targetComplexNode = SelectSingleNode(targetSchemas, $@"xs:complexType[@name='{nameAttribute.InnerText}']", namespaceManager);
                         if (targetComplexNode != null && targetComplexNode.HasChildNodes)
                         {
+                            matchingComplexNodes++;
                             if (targetComplexNode.InnerXml != sourceComplexNode.InnerXml)
                             {
                                 var nodeAnalyser = new NodeAnalyser();
@@ -126,6 +145,23 @@ namespace S100Lint.Model.XReference
                     }
                 }
             }
+
+            // add statistics
+            items.Add(new ReportItem
+            {
+                Level = Enumerations.Level.Info,
+                Message = $"Source- and target XMLSchema contain {matchingSimpleNodes} matching SimpleNode{(matchingSimpleNodes == 1 ? "" : "s")}",
+                TimeStamp = DateTime.Now,
+                Type = Enumerations.Type.Info
+            });
+
+            items.Add(new ReportItem
+            {
+                Level = Enumerations.Level.Info,
+                Message = $"Source- and target XMLSchema contain {matchingComplexNodes} matching ComplexNode{(matchingComplexNodes == 1 ? "" : "s")}",
+                TimeStamp = DateTime.Now,
+                Type = Enumerations.Type.Info
+            });
 
             return items;
         }

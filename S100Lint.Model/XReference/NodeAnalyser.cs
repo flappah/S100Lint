@@ -105,7 +105,7 @@ namespace S100Lint.Model.XReference
                                 items.Add(new ReportItem
                                 {
                                     Level = Enumerations.Level.Warning,
-                                    Message = $"The XmlNode '{breadCrumbTrail}' in type '{evalNode}' in the first schema is different from the same XmlNode in the second schema",
+                                    Message = $"The XmlNode '{breadCrumbTrail}' of type '{evalNode}' in the first schema is different from the same XmlNode in the second schema",
                                     TimeStamp = DateTime.Now,
                                     Type = Enumerations.Type.SimpleType
                                 });
