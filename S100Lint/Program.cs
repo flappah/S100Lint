@@ -2,6 +2,7 @@
 using S100Lint.Types.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace S100Lint
 {
@@ -20,43 +21,50 @@ namespace S100Lint
                 List<IReportItem> reportItems;
                 var schemaParser = new SchemaAnalyser();
 
-                if (file2.ToLower().Contains(".xsd"))
+                try
                 {
-                    Console.WriteLine($"Cross referencing schemafile '{file1}' with schemafile '{file2}'.");
-                    reportItems = schemaParser.XReference(file1, file2);
-                }
-                else
-                {
-                    Console.WriteLine($"Validating schemafile '{file1}' with feature catalogue '{file2}'.");
-                    reportItems = schemaParser.Validate(file1, file2);
-                }
-
-                Console.WriteLine("General Information:");
-                foreach (var reportItem in reportItems)
-                {
-                    if (reportItem.Type == Types.Enumerations.Type.Info)
+                    if (file2.ToLower().Contains(".xsd"))
                     {
-                        Console.WriteLine(reportItem.Message);
+                        Console.WriteLine($"Cross referencing schemafile '{file1}' with schemafile '{file2}'.");
+                        reportItems = schemaParser.XReference(file1, file2);
                     }
-                }
-
-                Console.WriteLine("\nIssues:");
-                int issueNumber = 1;
-                foreach (var reportItem in reportItems)
-                {
-                    if (reportItem.Type != Types.Enumerations.Type.Info)
+                    else
                     {
-                        if (reportItem.Chapter != 0)
+                        Console.WriteLine($"Validating schemafile '{file1}' with feature catalogue '{file2}'.");
+                        reportItems = schemaParser.Validate(file1, file2);
+                    }
+
+                    Console.WriteLine("General Information:");
+                    foreach (var reportItem in reportItems)
+                    {
+                        if (reportItem.Type == Types.Enumerations.Type.Info)
                         {
-                            Console.WriteLine();
-                            Console.WriteLine($"Chapter {reportItem.Chapter}");
-                            Console.WriteLine("-----------------------------");
-                        }
-                        else
-                        {
-                            Console.WriteLine($"({issueNumber++}) {reportItem.Level} - {reportItem.Message}");
+                            Console.WriteLine(reportItem.Message);
                         }
                     }
+
+                    Console.WriteLine("\nIssues:");
+                    int issueNumber = 1;
+                    foreach (var reportItem in reportItems)
+                    {
+                        if (reportItem.Type != Types.Enumerations.Type.Info)
+                        {
+                            if (reportItem.Chapter != 0)
+                            {
+                                Console.WriteLine();
+                                Console.WriteLine($"Chapter {reportItem.Chapter}");
+                                Console.WriteLine("-----------------------------");
+                            }
+                            else
+                            {
+                                Console.WriteLine($"({issueNumber++}) {reportItem.Level} - {reportItem.Message}");
+                            }
+                        }
+                    }
+                }
+                catch(FileNotFoundException ex)
+                {
+                    Console.WriteLine($"File not found! ({ex.Message}");
                 }
             }
         }

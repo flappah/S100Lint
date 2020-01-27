@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using S100Lint.Types;
+using System.Globalization;
 
 namespace S100Lint.Model.XReference
 {
@@ -112,6 +113,22 @@ namespace S100Lint.Model.XReference
                     if (nameAttribute != null && !String.IsNullOrEmpty(nameAttribute.InnerText))
                     {
                         var targetSimpleNode = SelectSingleNode(targetSchemas, $@"xs:simpleType[@name='{nameAttribute.InnerText}']", namespaceManager);
+                        if (targetSimpleNode == null || targetSimpleNode.ChildNodes.Count == 0 && !nameAttribute.InnerText.ToLower(CultureInfo.InvariantCulture).Contains("type", StringComparison.InvariantCulture))
+                        {
+                            targetSimpleNode = SelectSingleNode(targetSchemas, $@"xs:simpleType[@name='{nameAttribute.InnerText}Type']", namespaceManager);
+
+                            if (targetSimpleNode != null && targetSimpleNode.ChildNodes.Count > 0)
+                            {
+                                items.Add(new ReportItem
+                                {
+                                    Level = Enumerations.Level.Warning,
+                                    Message = $"Naming difference between first- and second schema. Found '{nameAttribute.InnerText}' versus '{nameAttribute.InnerText}Type'.",
+                                    TimeStamp = DateTime.Now,
+                                    Type = Enumerations.Type.SimpleType
+                                });
+                            }
+                        }
+
                         if (targetSimpleNode != null && targetSimpleNode.ChildNodes.Count > 0)
                         {
                             matchingSimpleNodes++;
@@ -133,6 +150,22 @@ namespace S100Lint.Model.XReference
                     if (nameAttribute != null && !String.IsNullOrEmpty(nameAttribute.InnerText))
                     {
                         var targetComplexNode = SelectSingleNode(targetSchemas, $@"xs:complexType[@name='{nameAttribute.InnerText}']", namespaceManager);
+                        if (targetComplexNode == null || targetComplexNode.ChildNodes.Count == 0 && !nameAttribute.InnerText.ToLower(CultureInfo.InvariantCulture).Contains("type", StringComparison.InvariantCulture))
+                        {
+                            targetComplexNode = SelectSingleNode(targetSchemas, $@"xs:complexType[@name='{nameAttribute.InnerText}Type']", namespaceManager);
+
+                            if (targetComplexNode != null && targetComplexNode.HasChildNodes)
+                            {
+                                items.Add(new ReportItem
+                                {
+                                    Level = Enumerations.Level.Warning,
+                                    Message = $"Naming difference between first- and second schema. Found '{nameAttribute.InnerText}' versus '{nameAttribute.InnerText}Type'.",
+                                    TimeStamp = DateTime.Now,
+                                    Type = Enumerations.Type.ComplexType
+                                });
+                            }
+                        }
+
                         if (targetComplexNode != null && targetComplexNode.HasChildNodes)
                         {
                             matchingComplexNodes++;
