@@ -5,3 +5,4 @@ reference two specified XML Schema's and scans them for commonalities. If it fin
 specified XML if the found nodes are equal. Any difference gets reported. 
 
 S100Lint requires .NET Core 3.1
+https://dotnet.microsoft.com/download/dotnet-core/3.1
