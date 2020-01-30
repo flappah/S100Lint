@@ -1,4 +1,4 @@
-﻿using S100Lint.Model;
+using S100Lint.Model;
 using S100Lint.Types.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -11,6 +11,8 @@ namespace S100Lint
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("S100Lint v0.2 (c) 2020, Royal Netherlands Hydrographic Service");
+
             if (args.Length < 2)
             {
                 Console.WriteLine(String.Format("Invalid syntax for S100Lint. Valid syntax is S100Lint [SchemaFileName] [SchemaFileName | FeatureCatalogueFileName] [options]\n\n" +
