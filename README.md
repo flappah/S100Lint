@@ -11,4 +11,8 @@ https://dotnet.microsoft.com/download/dotnet-core/3.1
 Building the solution requires Visual Studio 2019 for Windows or Mac.
 
 S100Lint usage:
-S100Lint [SchemaFileName] [SchemaFileName | FeatureCatalogueFileName]
+S100Lint [SchemaFileName] [SchemaFileName | FeatureCatalogueFileName] [options]
+
+Options:
+--fc: Checks if all the types included in the feature catalogue are defined in the XML schema.
+
