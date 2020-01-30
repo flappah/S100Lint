@@ -15,11 +15,17 @@ namespace S100Lint.Model
         /// Method cross references two schema files to search for commonalities and verifies if those 
         /// commonolities contains no differences
         /// </summary>
-        /// <param name="schemaFileNameSource"></param>
-        /// <param name="schemaFileNameTarget"></param>
-        /// <returns></returns>
-        public virtual List<IReportItem> XReference(string schemaFileNameSource, string schemaFileNameTarget)
+        /// <param name="schemaFileNameSource">filename of source</param>
+        /// <param name="schemaFileNameTarget">filename of target</param>
+        /// <param name="options">command line options</param>
+        /// <returns>List<IReportItem></returns>
+        public virtual List<IReportItem> XReference(string schemaFileNameSource, string schemaFileNameTarget, List<string> options)
         {
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
             var xmlFileReader = new XmlFileReader();
             var items = new List<IReportItem>();
 
@@ -96,15 +102,20 @@ namespace S100Lint.Model
             return items;
         }
 
-
         /// <summary>
         /// Validates the specified schema file with the specified catalogue file
         /// </summary>
-        /// <param name="schemaFilename"></param>
-        /// <param name="catalogueFileName"></param>
-        /// <returns></returns>
-        public virtual List<IReportItem> Validate(string schemaFilename, string catalogueFileName)
+        /// <param name="schemaFilename">filename of the schema</param>
+        /// <param name="catalogueFileName">filename of the catalogue</param>
+        /// <param name="options">command line options</param>
+        /// <returns>List<IReportItem><IReportItem></returns>
+        public virtual List<IReportItem> Validate(string schemaFilename, string catalogueFileName, List<string> options)
         {
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
             var xmlFileReader = new XmlFileReader();
             var items = new List<IReportItem>();
 
@@ -143,10 +154,12 @@ namespace S100Lint.Model
                     XmlNamespaceManager fcNsmgr = new XmlNamespaceManager(featureCatalogue.NameTable);
                     fcNsmgr.AddNamespace("S100FC", "http://www.iho.int/S100FC");
 
-                    // validate schema types vs defined types in featurecatalogue
-                    var featureCatalogueParser = new FeatureCatalogueParser();
-                    items.AddRange(featureCatalogueParser.Validate(featureCatalogue, fcNsmgr, xmlSchemas.ToArray(), xsdNsmgr));
-
+                    if (options.Contains("--fc"))
+                    {
+                        // validate schema types vs defined types in featurecatalogue
+                        var featureCatalogueParser = new FeatureCatalogueParser();
+                        items.AddRange(featureCatalogueParser.Validate(featureCatalogue, fcNsmgr, xmlSchemas.ToArray(), xsdNsmgr));
+                    }
                     var schemaSimpleTypeNodes = xmlSchema.LastChild.SelectNodes(@"xs:simpleType", xsdNsmgr);
                     if (schemaSimpleTypeNodes != null && schemaSimpleTypeNodes.Count > 0)
                     {

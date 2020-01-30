@@ -3,6 +3,7 @@ using S100Lint.Types.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace S100Lint
 {
@@ -10,16 +11,21 @@ namespace S100Lint
     {
         static void Main(string[] args)
         {
-            args = new string[] { "S122.xsd", "S122_FC.xml" };
-
-            if (args.Length != 2)
+            if (args.Length < 2)
             {
                 Console.WriteLine("Invalid syntax for S100Lint. Valid syntax is S100Lint [SchemaFileName] [SchemaFileName | FeatureCatalogueFileName]");
             }
             else 
             {
-                var file1 = args[0];
-                var file2 = args[1];
+                string file1 = args[0]; // source file name
+                string file2 = args[1]; // target file name
+
+                // retrieve specified command line options if any
+                var options = (from string arg in args
+                               where arg.Contains("--")
+                               select arg).ToList();
+
+                // start analysing
                 List<IReportItem> reportItems;
                 var schemaParser = new SchemaAnalyser();
 
@@ -28,12 +34,12 @@ namespace S100Lint
                     if (file2.ToLower().Contains(".xsd"))
                     {
                         Console.WriteLine($"Cross referencing schemafile '{file1}' with schemafile '{file2}'.");
-                        reportItems = schemaParser.XReference(file1, file2);
+                        reportItems = schemaParser.XReference(file1, file2, options);
                     }
                     else
                     {
                         Console.WriteLine($"Validating schemafile '{file1}' with feature catalogue '{file2}'.");
-                        reportItems = schemaParser.Validate(file1, file2);
+                        reportItems = schemaParser.Validate(file1, file2, options);
                     }
 
                     Console.WriteLine("General Information:");
