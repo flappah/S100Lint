@@ -4,6 +4,7 @@ using S100Lint.Types;
 using S100Lint.Types.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Xml;
 
 namespace S100Lint.Model.Validation
@@ -136,58 +137,84 @@ namespace S100Lint.Model.Validation
 
             foreach (XmlNode catalogueNode in nodes)
             {
-                XmlNode fcNameNode = catalogueNode.SelectSingleNode(@"S100FC:code", fcNsManager);
-                XmlNode fcAliasNode = catalogueNode.SelectSingleNode(@"S100FC:alias", fcNsManager);
-
-                if (fcNameNode != null)
+                XmlAttribute abstractAttribute = FindAttributeByName(catalogueNode.Attributes, "isAbstract");
+                bool isAbstract = false;
+                if (abstractAttribute != null)
                 {
-                    string fcTypeName = catalogueNode.Name.LastPart("_");
+                    isAbstract = abstractAttribute.InnerText.ToLower(CultureInfo.InvariantCulture) == "true";
+                }
 
-                    string fcComplexTypeName = fcNameNode.InnerText;
-                    string fcComplexTypeAlias = "";
-                    if (fcAliasNode != null)
+                if (!isAbstract)
+                {
+                    XmlNode fcNameNode = catalogueNode.SelectSingleNode(@"S100FC:code", fcNsManager);
+                    XmlNode fcAliasNode = catalogueNode.SelectSingleNode(@"S100FC:alias", fcNsManager);
+
+                    if (fcNameNode != null)
                     {
-                        fcComplexTypeAlias = fcAliasNode.InnerText;
-                    }
+                        string fcTypeName = catalogueNode.Name.LastPart("_");
 
-                    // now check if the simpletype in the feature catalogue exists in the schema
-                    var schemaComplexTypeNode = SelectSingleNode(schemaDocuments, $@"xs:complexType[@name='{fcComplexTypeName}']", schemaNsManager);
-                    if (schemaComplexTypeNode == null)
-                    {
-                        schemaComplexTypeNode = SelectSingleNode(schemaDocuments, $@"xs:complexType[contains(@name, '{fcComplexTypeName}')]", schemaNsManager);
-
-                        if (schemaComplexTypeNode != null)
+                        string fcComplexTypeName = fcNameNode.InnerText;
+                        string fcComplexTypeAlias = "";
+                        if (fcAliasNode != null)
                         {
-                            var nameAttribute = FindAttributeByName(schemaComplexTypeNode.Attributes, "name");
-
-                            issues.Add(new ReportItem
-                            {
-                                Level = Enumerations.Level.Warning,
-                                Message = $"The {fcTypeName} defined in the feature catalogue as '{fcComplexTypeName}' is defined in the XML Schema as '{nameAttribute.InnerText}'",
-                                TimeStamp = DateTime.Now,
-                                Type = Enumerations.Type.SimpleType
-                            });
-                        }
-                    }
-
-                    if (schemaComplexTypeNode == null)
-                    {
-                        // sometimes the schema uses the alias
-                        if (!String.IsNullOrEmpty(fcComplexTypeAlias))
-                        {
-                            schemaComplexTypeNode = SelectSingleNode(schemaDocuments, $@"xs:complexType[@name='{fcComplexTypeAlias}']", schemaNsManager);
+                            fcComplexTypeAlias = fcAliasNode.InnerText;
                         }
 
-                        // if node still isn't defined generate a warning
+                        // now check if the simpletype in the feature catalogue exists in the schema. First check the xs:element
+                        var schemaComplexTypeNode = SelectSingleNode(schemaDocuments, $@"xs:element[@name='{fcComplexTypeName}']", schemaNsManager);
                         if (schemaComplexTypeNode == null)
                         {
-                            issues.Add(new ReportItem
+                            // if there's no xs:element, try xs:complexType
+                            schemaComplexTypeNode = SelectSingleNode(schemaDocuments, $@"xs:complexType[@name='{fcComplexTypeName}']", schemaNsManager);
+                            if (schemaComplexTypeNode == null)
                             {
-                                Level = Enumerations.Level.Warning,
-                                Message = $"The {fcTypeName} with the name '{fcComplexTypeName}' as defined in the feature catalogue does not exist in the schema",
-                                TimeStamp = DateTime.Now,
-                                Type = Enumerations.Type.SimpleType
-                            });
+                                // if that does not work, try to see if the node exists but with characters appended to it.
+                                if (schemaComplexTypeNode == null)
+                                {
+                                    schemaComplexTypeNode = SelectSingleNode(schemaDocuments, $@"xs:complexType[contains(@name, '{fcComplexTypeName}')]", schemaNsManager);
+
+                                    // sometimes the schema uses the alias
+                                    if (schemaComplexTypeNode == null && !String.IsNullOrEmpty(fcComplexTypeAlias))
+                                    {
+                                        schemaComplexTypeNode = SelectSingleNode(schemaDocuments, $@"xs:element[@name='{fcComplexTypeAlias}']", schemaNsManager);
+                                        if (schemaComplexTypeNode == null)
+                                        {
+                                            schemaComplexTypeNode = SelectSingleNode(schemaDocuments, $@"xs:complexType[@name='{fcComplexTypeAlias}']", schemaNsManager);
+
+                                            if (schemaComplexTypeNode == null)
+                                            {
+                                                schemaComplexTypeNode = SelectSingleNode(schemaDocuments, $@"xs:complexType[contains(@name, '{fcComplexTypeAlias}')]", schemaNsManager);
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // if this does generate a hit generate a warning that the type exists but with a (slighly) different name
+                                if (schemaComplexTypeNode != null)
+                                {
+                                    var nameAttribute = FindAttributeByName(schemaComplexTypeNode.Attributes, "name");
+
+                                    issues.Add(new ReportItem
+                                    {
+                                        Level = Enumerations.Level.Warning,
+                                        Message = $"The {fcTypeName} defined in the feature catalogue as '{fcComplexTypeName}' is defined in the XML Schema as '{nameAttribute.InnerText}'",
+                                        TimeStamp = DateTime.Now,
+                                        Type = Enumerations.Type.SimpleType
+                                    });
+                                }
+                            }
+
+                            // if node still isn't defined generate a warning
+                            if (schemaComplexTypeNode == null)
+                            {
+                                issues.Add(new ReportItem
+                                {
+                                    Level = Enumerations.Level.Warning,
+                                    Message = $"The {fcTypeName} with the name '{fcComplexTypeName}' as defined in the feature catalogue does not exist in the schema",
+                                    TimeStamp = DateTime.Now,
+                                    Type = Enumerations.Type.SimpleType
+                                });
+                            }
                         }
                     }
                 }

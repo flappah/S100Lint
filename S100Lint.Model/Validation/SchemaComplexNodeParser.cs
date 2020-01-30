@@ -125,6 +125,7 @@ namespace S100Lint.Model.Validation
                                 featureCatalogue.LastChild.SelectNodes($@"//S100FC:code[.='{complexTypeName.Replace("Type", "", StringComparison.InvariantCulture)}']", fcNsmgr);
                         }
 
+                        
                         XmlNodeList overallcheckNodeListLoose =
                                 featureCatalogue.LastChild.SelectNodes($@"//S100FC:code[translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='{complexTypeName.ToLower(CultureInfo.InvariantCulture)}']", fcNsmgr);
 
