@@ -13,7 +13,8 @@
         public enum Chapter
         {
             SimpleTypes = 10,
-            ComplexTypes = 20
+            ComplexTypes = 20,
+            FeatureCatalogueBaseCheck = 30
         }
 
         public enum Type

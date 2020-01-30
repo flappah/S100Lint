@@ -140,25 +140,36 @@ namespace S100Lint.Model
                         }
                     }
 
-                    // parse all simpletypes
-                    var simpleTypeNodes = xmlSchema.LastChild.SelectNodes(@"xs:simpleType", xsdNsmgr);
+                    XmlNamespaceManager fcNsmgr = new XmlNamespaceManager(featureCatalogue.NameTable);
+                    fcNsmgr.AddNamespace("S100FC", "http://www.iho.int/S100FC");
 
-                    var simpleTypeParser = new SchemaSimpleNodeParser();
-                    items.AddRange(simpleTypeParser.Parse(simpleTypeNodes, xmlSchemas.ToArray(), featureCatalogue));
+                    // validate schema types vs defined types in featurecatalogue
+                    var featureCatalogueParser = new FeatureCatalogueParser();
+                    items.AddRange(featureCatalogueParser.Validate(featureCatalogue, fcNsmgr, xmlSchemas.ToArray(), xsdNsmgr));
 
-                    // parse all complexTypes
-                    var complexTypeNodes = xmlSchema.LastChild.SelectNodes(@"xs:complexType", xsdNsmgr);
+                    var schemaSimpleTypeNodes = xmlSchema.LastChild.SelectNodes(@"xs:simpleType", xsdNsmgr);
+                    if (schemaSimpleTypeNodes != null && schemaSimpleTypeNodes.Count > 0)
+                    {
+                        // parse all simpletypes
+                        var simpleTypeParser = new SchemaSimpleNodeParser();
+                        items.AddRange(simpleTypeParser.Parse(schemaSimpleTypeNodes, xmlSchemas.ToArray(), featureCatalogue));
+                    }
 
-                    var complexTypeParser = new SchemaComplexNodeParser();
-                    items.AddRange(complexTypeParser.Parse(complexTypeNodes, xmlSchemas.ToArray(), featureCatalogue));
+                    var schemaComplexTypeNodes = xmlSchema.LastChild.SelectNodes(@"xs:complexType", xsdNsmgr);
+                    if (schemaComplexTypeNodes != null && schemaComplexTypeNodes.Count > 0)
+                    {
+                        // parse all complexTypes
+                        var complexTypeParser = new SchemaComplexNodeParser();
+                        items.AddRange(complexTypeParser.Parse(schemaComplexTypeNodes, xmlSchemas.ToArray(), featureCatalogue));
+                    }
 
                     // add statistics
-                    if (simpleTypeNodes.Count > 0 || complexTypeNodes.Count > 0)
+                    if (schemaSimpleTypeNodes.Count > 0 || schemaComplexTypeNodes.Count > 0)
                     {
                         items.Add(new ReportItem
                         {
                             Level = Enumerations.Level.Info,
-                            Message = $"Source XMLSchema contains {simpleTypeNodes.Count} SimpleNode{(simpleTypeNodes.Count == 1 ? "" : "s")} {(simpleTypeNodes.Count > 0 ? $"and {complexTypeNodes.Count} ComplexNode{(complexTypeNodes.Count == 1 ? "" : "s")}" : "")}",
+                            Message = $"Source XMLSchema contains {schemaSimpleTypeNodes.Count} SimpleNode{(schemaSimpleTypeNodes.Count == 1 ? "" : "s")} {(schemaSimpleTypeNodes.Count > 0 ? $"and {schemaComplexTypeNodes.Count} ComplexNode{(schemaComplexTypeNodes.Count == 1 ? "" : "s")}" : "")}",
                             TimeStamp = DateTime.Now,
                             Type = Enumerations.Type.Info
                         });
