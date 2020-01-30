@@ -7,3 +7,8 @@ specified XML if the found nodes are equal. Any difference gets reported.
 S100Lint requires .NET Core 3.1
 
 https://dotnet.microsoft.com/download/dotnet-core/3.1
+
+Building the solution requires Visual Studio 2019 for Windows or Mac.
+
+S100Lint usage:
+S100Lint [SchemaFileName] [SchemaFileName | FeatureCatalogueFileName]
