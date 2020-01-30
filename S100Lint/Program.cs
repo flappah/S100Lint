@@ -10,6 +10,8 @@ namespace S100Lint
     {
         static void Main(string[] args)
         {
+            args = new string[] { "S122.xsd", "S122_FC.xml" };
+
             if (args.Length != 2)
             {
                 Console.WriteLine("Invalid syntax for S100Lint. Valid syntax is S100Lint [SchemaFileName] [SchemaFileName | FeatureCatalogueFileName]");
