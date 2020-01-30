@@ -1,2 +1,4 @@
 Versions:
-0.1 - 2020/01/30 - First release
+0.1 - 2020/01/15 - First release
+0.2 - 2020/01/30 - Added cross checking with feature catalogue. It checks if types defined in the feature catalogue
+                   also exist in the specified XML Schema.
