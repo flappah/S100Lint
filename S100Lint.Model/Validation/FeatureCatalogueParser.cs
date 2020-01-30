@@ -66,6 +66,19 @@ namespace S100Lint.Model.Validation
                         if (schemaSingleTypeNode == null)
                         {
                             schemaSingleTypeNode = SelectSingleNode(schemaDocuments, $@"xs:simpleType[contains(@name, '{fcSingleTypeName}')]", schemaNsManager);
+
+                            if (schemaSingleTypeNode != null)
+                            {
+                                var nameAttribute = FindAttributeByName(schemaSingleTypeNode.Attributes, "name");
+
+                                issues.Add(new ReportItem
+                                {
+                                    Level = Enumerations.Level.Warning,
+                                    Message = $"The SimpleType defined in the feature catalogue as '{fcSingleTypeName}' is defined in the XML Schema as '{nameAttribute.InnerText}'",
+                                    TimeStamp = DateTime.Now,
+                                    Type = Enumerations.Type.SimpleType
+                                });
+                            }
                         }
 
                         if (schemaSingleTypeNode == null)
@@ -115,6 +128,19 @@ namespace S100Lint.Model.Validation
                         if (schemaComplexTypeNode == null)
                         {
                             schemaComplexTypeNode = SelectSingleNode(schemaDocuments, $@"xs:complexType[contains(@name, '{fcComplexTypeName}')]", schemaNsManager);
+
+                            if (schemaComplexTypeNode != null)
+                            {
+                                var nameAttribute = FindAttributeByName(schemaComplexTypeNode.Attributes, "name");
+
+                                issues.Add(new ReportItem
+                                {
+                                    Level = Enumerations.Level.Warning,
+                                    Message = $"The SimpleType defined in the feature catalogue as '{fcComplexTypeName}' is defined in the XML Schema as '{nameAttribute.InnerText}'",
+                                    TimeStamp = DateTime.Now,
+                                    Type = Enumerations.Type.SimpleType
+                                });
+                            }
                         }
 
                         if (schemaComplexTypeNode == null)
