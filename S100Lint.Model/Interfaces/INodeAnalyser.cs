@@ -4,7 +4,7 @@ using System.Xml;
 
 namespace S100Lint.Model.Interfaces
 {
-    public interface INodeAnalyser
+    public interface INodeAnalyser : IS100LintBase
     {
         List<IReportItem> Analyse(string evalNode, XmlNode sourceNode, XmlNode targetNode, XmlNamespaceManager namespaceManager);
     }
