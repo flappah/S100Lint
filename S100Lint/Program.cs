@@ -13,7 +13,9 @@ namespace S100Lint
         {
             if (args.Length < 2)
             {
-                Console.WriteLine("Invalid syntax for S100Lint. Valid syntax is S100Lint [SchemaFileName] [SchemaFileName | FeatureCatalogueFileName]");
+                Console.WriteLine(String.Format("Invalid syntax for S100Lint. Valid syntax is S100Lint [SchemaFileName] [SchemaFileName | FeatureCatalogueFileName] [options]\n\n" +
+                    "Options:\n " +
+                    "--fc: Checks if all the types included in the feature catalogue are defined in the XML schema."));
             }
             else 
             {
