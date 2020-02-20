@@ -165,14 +165,17 @@ namespace S100Lint.Model.Validation
                         if ((overallcheckNodeListStrict == null || overallcheckNodeListStrict.Count == 0) &&
                             (overallcheckNodeListLoose == null || overallcheckNodeListLoose.Count == 0))
                         {
-                            reportItem =
-                                new ReportItem
-                                {
-                                    Level = Enumerations.Level.Warning,
-                                    Type = Enum.Parse<Enumerations.Type>(parentNodeTypeName, true),
-                                    Message = $"{complexTypeName} is not defined in the feature catalogue",
-                                    TimeStamp = DateTime.Now
-                                };
+                            if (SystemConfig.Options.Contains("--s"))
+                            {
+                                reportItem =
+                                    new ReportItem
+                                    {
+                                        Level = Enumerations.Level.Warning,
+                                        Type = Enum.Parse<Enumerations.Type>(parentNodeTypeName, true),
+                                        Message = $"{complexTypeName} is not defined in the feature catalogue",
+                                        TimeStamp = DateTime.Now
+                                    };
+                            }
                         }
                         else if ((overallcheckNodeListStrict == null || overallcheckNodeListStrict.Count == 0) &&
                                  (overallcheckNodeListLoose != null && overallcheckNodeListLoose.Count > 0))
