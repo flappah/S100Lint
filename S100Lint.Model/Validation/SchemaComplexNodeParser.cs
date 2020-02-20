@@ -36,7 +36,6 @@ namespace S100Lint.Model.Validation
             }
 
             var issues = new List<IReportItem>();
-            issues.Add(new ReportItem { Chapter = Enumerations.Chapter.ComplexTypes });
 
             if (typeNodes != null && typeNodes.Count > 0)
             {

@@ -1,4 +1,5 @@
-﻿using S100Lint.Model.Interfaces;
+﻿using S100Lint.Base;
+using S100Lint.Model.Interfaces;
 using S100Lint.Model.Validation;
 using S100Lint.Model.XReference;
 using S100Lint.Types;
@@ -19,13 +20,8 @@ namespace S100Lint.Model
         /// <param name="schemaFileNameTarget">filename of target</param>
         /// <param name="options">command line options</param>
         /// <returns>List<IReportItem></returns>
-        public virtual List<IReportItem> XReference(string schemaFileNameSource, string schemaFileNameTarget, List<string> options)
+        public virtual List<IReportItem> XReference(string schemaFileNameSource, string schemaFileNameTarget)
         {
-            if (options is null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
             var xmlFileReader = new XmlFileReader();
             var items = new List<IReportItem>();
 
@@ -109,13 +105,8 @@ namespace S100Lint.Model
         /// <param name="catalogueFileName">filename of the catalogue</param>
         /// <param name="options">command line options</param>
         /// <returns>List<IReportItem><IReportItem></returns>
-        public virtual List<IReportItem> Validate(string schemaFilename, string catalogueFileName, List<string> options)
+        public virtual List<IReportItem> Validate(string schemaFilename, string catalogueFileName)
         {
-            if (options is null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
             var xmlFileReader = new XmlFileReader();
             var items = new List<IReportItem>();
 
@@ -154,12 +145,17 @@ namespace S100Lint.Model
                     XmlNamespaceManager fcNsmgr = new XmlNamespaceManager(featureCatalogue.NameTable);
                     fcNsmgr.AddNamespace("S100FC", "http://www.iho.int/S100FC");
 
-                    if (options.Contains("--fc"))
+                    if (SystemConfig.Options.Contains("--fc"))
                     {
+                        items.Add(new ReportItem { Chapter = Enumerations.Chapter.SchemaCompletenessCheck });
+
                         // validate schema types vs defined types in featurecatalogue
                         var featureCatalogueParser = new FeatureCatalogueParser();
                         items.AddRange(featureCatalogueParser.Validate(featureCatalogue, fcNsmgr, xmlSchemas.ToArray(), xsdNsmgr));
                     }
+
+                    items.Add(new ReportItem { Chapter = Enumerations.Chapter.SchemaValidityCheck });
+
                     var schemaSimpleTypeNodes = xmlSchema.LastChild.SelectNodes(@"xs:simpleType", xsdNsmgr);
                     if (schemaSimpleTypeNodes != null && schemaSimpleTypeNodes.Count > 0)
                     {

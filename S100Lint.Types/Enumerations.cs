@@ -12,9 +12,8 @@
 
         public enum Chapter
         {
-            SimpleTypes = 10,
-            ComplexTypes = 20,
-            FeatureCatalogueBaseCheck = 30
+            SchemaValidityCheck = 10,
+            SchemaCompletenessCheck = 20
         }
 
         public enum Type

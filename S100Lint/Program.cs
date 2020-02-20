@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using S100Lint.Base;
 
 namespace S100Lint
 {
@@ -11,13 +12,14 @@ namespace S100Lint
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("S100Lint v0.2 (c) 2020, Royal Netherlands Hydrographic Service");
+            Console.WriteLine("S100Lint v0.21 (c) 2020, Royal Netherlands Hydrographic Service");
 
             if (args.Length < 2)
             {
                 Console.WriteLine(String.Format("Invalid syntax for S100Lint. Valid syntax is S100Lint [SchemaFileName] [SchemaFileName | FeatureCatalogueFileName] [options]\n\n" +
                     "Options:\n " +
-                    "--fc: Checks if all the types included in the feature catalogue are defined in the XML schema."));
+                    "--fc: Checks if all the types included in the feature catalogue are defined in the XML schema.\n" +
+                    "--s:  Do a strict validation."));
             }
             else 
             {
@@ -25,9 +27,10 @@ namespace S100Lint
                 string file2 = args[1]; // target file name
 
                 // retrieve specified command line options if any
-                var options = (from string arg in args
-                               where arg.Contains("--")
-                               select arg).ToList();
+                SystemConfig.Options = 
+                    (from string arg in args
+                    where arg.Contains("--")
+                    select arg).ToList();
 
                 // start analysing
                 List<IReportItem> reportItems;
@@ -38,12 +41,12 @@ namespace S100Lint
                     if (file2.ToLower().Contains(".xsd"))
                     {
                         Console.WriteLine($"Cross referencing schemafile '{file1}' with schemafile '{file2}'.");
-                        reportItems = schemaParser.XReference(file1, file2, options);
+                        reportItems = schemaParser.XReference(file1, file2);
                     }
                     else
                     {
                         Console.WriteLine($"Validating schemafile '{file1}' with feature catalogue '{file2}'.");
-                        reportItems = schemaParser.Validate(file1, file2, options);
+                        reportItems = schemaParser.Validate(file1, file2);
                     }
 
                     Console.WriteLine("General Information:");
@@ -64,8 +67,8 @@ namespace S100Lint
                             if (reportItem.Chapter != 0)
                             {
                                 Console.WriteLine();
-                                Console.WriteLine($"Chapter {reportItem.Chapter}");
-                                Console.WriteLine("-----------------------------");
+                                Console.WriteLine(reportItem.Chapter);
+                                Console.WriteLine(new String('-', reportItem.Chapter.ToString().Length));
                             }
                             else
                             {

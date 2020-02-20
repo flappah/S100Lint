@@ -1,10 +1,11 @@
-﻿using S100Lint.Model.Interfaces;
+﻿using S100Lint.Base;
+using S100Lint.Model.Interfaces;
 using S100Lint.Types;
+using S100Lint.Types.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Xml;
-using S100Lint.Types.Interfaces;
 
 namespace S100Lint.Model.Validation
 {
@@ -34,7 +35,6 @@ namespace S100Lint.Model.Validation
             }
 
             var issues = new List<IReportItem>();
-            issues.Add(new ReportItem { Chapter = Enumerations.Chapter.SimpleTypes });
 
             if (typeNodes != null && typeNodes.Count > 0)
             {
@@ -153,14 +153,17 @@ namespace S100Lint.Model.Validation
                         }
                         else
                         {
-                            issues.Add(
-                                new ReportItem
-                                {
-                                    Level = Enumerations.Level.Warning,
-                                    Type = Enumerations.Type.SimpleType,
-                                    Message = $"{simpleTypeName} is not defined in the feature catalogue",
-                                    TimeStamp = DateTime.Now
-                                });
+                            if (SystemConfig.Options.Contains("--s"))
+                            {
+                                issues.Add(
+                                    new ReportItem
+                                    {
+                                        Level = Enumerations.Level.Warning,
+                                        Type = Enumerations.Type.SimpleType,
+                                        Message = $"{simpleTypeName} is not defined in the feature catalogue",
+                                        TimeStamp = DateTime.Now
+                                    });
+                            }
                         }
                     }
 

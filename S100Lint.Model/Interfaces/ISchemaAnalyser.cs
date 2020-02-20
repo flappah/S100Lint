@@ -13,7 +13,7 @@ namespace S100Lint.Model.Interfaces
         /// <param name="schemaFileNameTarget">filename of target</param>
         /// <param name="options">command line options</param>
         /// <returns>List<IReportItem></returns>
-        List<IReportItem> XReference(string schemaFileNameSource, string schemaFileNameTarget, List<string> options);
+        List<IReportItem> XReference(string schemaFileNameSource, string schemaFileNameTarget);
 
         /// <summary>
         /// Validates the specified schema file with the specified catalogue file
@@ -22,6 +22,6 @@ namespace S100Lint.Model.Interfaces
         /// <param name="catalogueFileName">filename of the catalogue</param>
         /// <param name="options">command line options</param>
         /// <returns>List<IReportItem><IReportItem></returns>
-        List<IReportItem> Validate(string schemaFilename, string catalogueFileName, List<string> options);
+        List<IReportItem> Validate(string schemaFilename, string catalogueFileName);
     }
 }

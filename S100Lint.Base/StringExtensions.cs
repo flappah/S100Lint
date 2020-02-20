@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Globalization;
+using System.Linq;
 
 namespace S100Lint.Base
 {
@@ -42,5 +42,14 @@ namespace S100Lint.Base
             return item.Substring(start + 1, item.Length - start - 1);
         }
 
+        public static bool In<T>(this T item, params T[] items)
+        {
+            if (items == null)
+            {
+                throw new ArgumentException("items");
+            }
+
+            return items.Contains(item);
+        }
     }
 }
