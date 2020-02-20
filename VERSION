@@ -2,3 +2,6 @@ Versions:
 0.1 - 2020/01/15 - First release
 0.2 - 2020/01/30 - Added cross checking with feature catalogue. It checks if types defined in the feature catalogue
                    also exist in the specified XML Schema.
+0.21- 2020/02/20 - Added strict (--s) option that omits certain checks that usually are more warning than errors. In this case
+                   this is primarily added for the "Type" check that checks if a certain simple- or complextype exists with 
+                   "Type" added to it. This whilst the feature catalogue has it defined without "Type" added to it. 
